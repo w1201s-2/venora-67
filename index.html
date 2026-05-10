@@ -1,0 +1,2802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Venora</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500&family=Playfair+Display:wght@700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap"/>
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.344.0/dist/umd/lucide.min.js"></script>
+<style>
+/* ═══════════════════════════════════════
+   VENORA DESIGN SYSTEM
+═══════════════════════════════════════ */
+:root {
+  --bg:#080808; --bg2:#0f0f0f; --bg3:#171717; --bg4:#202020; --bg5:#2a2a2a;
+  --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.13); --border3:rgba(255,255,255,0.22);
+  --glass:rgba(255,255,255,0.04); --glass2:rgba(255,255,255,0.07); --glass3:rgba(255,255,255,0.11);
+  --text:#efefef; --text2:#888; --text3:#444; --text4:#2a2a2a;
+  --white:#fff; --black:#000;
+  --accent:#fff; --accent-dim:rgba(255,255,255,0.08);
+  --coin:#f5c518; --coin-dim:rgba(245,197,24,0.15);
+  --radius:13px; --blur:20px;
+  --anim:0.3s; --anim-fast:0.15s; --anim-slow:0.5s;
+  --font:'Inter',sans-serif; --font-mono:'Fira Code',monospace; --font-display:'Space Grotesk',sans-serif;
+  --fs:14px; --sidebar:230px;
+  --shadow:0 8px 32px rgba(0,0,0,0.6); --shadow-lg:0 20px 60px rgba(0,0,0,0.8);
+}
+.light {
+  --bg:#f8f8f8; --bg2:#fff; --bg3:#f0f0f0; --bg4:#e8e8e8; --bg5:#ddd;
+  --border:rgba(0,0,0,0.07); --border2:rgba(0,0,0,0.13); --border3:rgba(0,0,0,0.22);
+  --glass:rgba(0,0,0,0.03); --glass2:rgba(0,0,0,0.05); --glass3:rgba(0,0,0,0.09);
+  --text:#111; --text2:#666; --text3:#bbb; --text4:#ddd;
+  --white:#111; --black:#fff; --accent:#111; --accent-dim:rgba(0,0,0,0.06);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;font-family:var(--font);font-size:var(--fs);background:var(--bg);color:var(--text);transition:background var(--anim),color var(--anim)}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* ══════════════════════════
+   LOADING SCREEN
+══════════════════════════ */
+#loader{position:fixed;inset:0;z-index:99999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;overflow:hidden}
+#loader-venus-wrap{position:relative;width:120px;height:120px;margin-bottom:32px}
+#loader-venus{width:120px;height:120px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#555,#222,#080808);border:2px solid rgba(255,255,255,0.15);animation:venusSpin 0.4s linear infinite;position:relative;box-shadow:0 0 40px rgba(255,255,255,0.08),inset 0 0 30px rgba(0,0,0,0.8)}
+#loader-venus::after{content:'';position:absolute;inset:10px;border-radius:50%;border:1px solid rgba(255,255,255,0.06);border-top-color:rgba(255,255,255,0.2);animation:venusSpin 0.2s linear infinite reverse}
+@keyframes venusSpin{to{transform:rotate(360deg)}}
+#loader-title{font-family:var(--font-display);font-size:42px;font-weight:900;color:var(--white);letter-spacing:-2px;display:flex;align-items:center;gap:0;overflow:hidden}
+#loader-ven{opacity:0;animation:loaderFadeIn 0.5s ease 0.8s forwards}
+#loader-mid{width:0;overflow:hidden;animation:loaderExpand 0.6s cubic-bezier(0.34,1.56,0.64,1) 1.4s forwards;display:flex;align-items:center;justify-content:center}
+#loader-planet{width:28px;height:28px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#555,#1a1a1a);border:1px solid rgba(255,255,255,0.2);flex-shrink:0;animation:venusSpin 0.3s linear infinite}
+#loader-ra{opacity:0;animation:loaderFadeIn 0.5s ease 1.9s forwards}
+#loader-bar{width:200px;height:2px;background:var(--bg4);border-radius:1px;overflow:hidden;margin-top:24px;opacity:0;animation:loaderFadeIn 0.3s ease 0.5s forwards}
+#loader-bar-fill{height:100%;background:var(--white);border-radius:1px;width:0;animation:loaderLoad 1.8s ease forwards}
+#loader-sub{font-size:12px;color:var(--text3);margin-top:10px;opacity:0;animation:loaderFadeIn 0.5s ease 1s forwards;letter-spacing:2px;text-transform:uppercase}
+@keyframes loaderFadeIn{to{opacity:1}}
+@keyframes loaderExpand{to{width:34px}}
+@keyframes loaderLoad{to{width:100%}}
+#loader.out{animation:loaderOut 0.6s ease forwards}
+@keyframes loaderOut{to{opacity:0;transform:scale(1.03);pointer-events:none}}
+
+/* ══════════════════════════
+   AUTH SCREEN
+══════════════════════════ */
+#auth-screen{position:fixed;inset:0;z-index:9998;background:var(--bg);display:flex;align-items:center;justify-content:center;display:none}
+.auth-box{width:380px;max-width:92vw;background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:32px;box-shadow:var(--shadow-lg)}
+.auth-logo{text-align:center;margin-bottom:24px}
+.auth-logo-icon{width:52px;height:52px;border-radius:14px;background:var(--white);color:var(--black);display:inline-flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:900;font-size:22px;margin-bottom:10px}
+.auth-title{font-size:22px;font-weight:800;text-align:center;margin-bottom:4px}
+.auth-sub{font-size:13px;color:var(--text2);text-align:center;margin-bottom:24px}
+.auth-tabs{display:flex;background:var(--bg3);border-radius:10px;padding:3px;margin-bottom:20px}
+.auth-tab{flex:1;padding:7px;border-radius:8px;border:none;background:none;font-family:var(--font);font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;transition:all var(--anim-fast)}
+.auth-tab.active{background:var(--bg2);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,0.3)}
+.auth-err{font-size:12px;color:#ff6b6b;margin-top:8px;display:none}
+
+/* ══════════════════════════
+   SHELL LAYOUT
+══════════════════════════ */
+#shell{display:flex;height:100vh;opacity:0;transition:opacity 0.5s}
+#shell.visible{opacity:1}
+
+/* ══════════════════════════
+   SIDEBAR
+══════════════════════════ */
+#sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;transition:width var(--anim) cubic-bezier(0.4,0,0.2,1),min-width var(--anim) cubic-bezier(0.4,0,0.2,1);overflow:hidden;flex-shrink:0;position:relative;z-index:10}
+#sidebar.col{width:58px;min-width:58px}
+#sidebar-top{display:flex;align-items:center;padding:14px 12px;border-bottom:1px solid var(--border);gap:10px;min-height:58px;flex-shrink:0}
+#logo-wrap{display:flex;align-items:center;gap:10px;overflow:hidden;flex:1}
+#logo-icon{width:32px;height:32px;border-radius:9px;background:var(--white);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--black);font-family:var(--font-display);font-weight:900;font-size:14px;letter-spacing:-1px}
+#logo-text{font-size:16px;font-weight:800;color:var(--white);letter-spacing:-.4px;white-space:nowrap;transition:opacity var(--anim),width var(--anim);font-family:var(--font-display)}
+#sidebar.col #logo-text{opacity:0;width:0}
+#tog-btn{width:28px;height:28px;border-radius:8px;border:none;background:var(--glass);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s;flex-shrink:0}
+#tog-btn:hover{background:var(--glass2);color:var(--text)}
+#tog-btn svg{width:14px;height:14px;transition:transform var(--anim)}
+#sidebar.col #tog-btn svg{transform:rotate(180deg)}
+/* User mini */
+#sidebar-user{padding:12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;overflow:hidden;cursor:pointer;transition:background .15s;border-radius:0}
+#sidebar-user:hover{background:var(--glass)}
+.su-avatar{width:32px;height:32px;border-radius:50%;background:var(--bg4);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;overflow:hidden}
+.su-avatar img{width:100%;height:100%;object-fit:cover}
+.su-info{overflow:hidden;transition:opacity var(--anim),width var(--anim)}
+#sidebar.col .su-info{opacity:0;width:0}
+.su-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.su-coins{font-size:11px;color:var(--coin);white-space:nowrap}
+/* Nav */
+#nav{flex:1;padding:8px 0;overflow-y:auto;overflow-x:hidden}
+.nav-item{display:flex;align-items:center;gap:11px;padding:9px 11px;margin:1px 6px;border-radius:9px;cursor:pointer;color:var(--text2);font-size:13px;font-weight:500;white-space:nowrap;transition:background var(--anim-fast),color var(--anim-fast),transform var(--anim-fast);border:none;background:none;width:calc(100% - 12px);text-align:left;position:relative}
+.nav-item:hover{background:var(--glass2);color:var(--text);transform:translateX(2px)}
+.nav-item.active{background:var(--white);color:var(--black);font-weight:600}
+.nav-item.active svg{color:var(--black)}
+.ni-icon{width:30px;height:30px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ni-icon svg{width:17px;height:17px}
+.ni-lbl{transition:opacity var(--anim),width var(--anim);overflow:hidden}
+#sidebar.col .ni-lbl{opacity:0;width:0}
+.nav-badge{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:var(--coin);color:#000;font-size:10px;font-weight:700;border-radius:99px;padding:1px 6px;display:none}
+#sidebar.col .nav-badge{display:none!important}
+/* Sidebar bottom */
+#sidebar-bot{padding:8px 6px 12px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:1px}
+
+/* ══════════════════════════
+   MAIN
+══════════════════════════ */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+#topbar{height:58px;display:flex;align-items:center;padding:0 20px;border-bottom:1px solid var(--border);background:var(--bg2);flex-shrink:0;gap:12px;backdrop-filter:blur(var(--blur))}
+#page-title{font-size:16px;font-weight:700;color:var(--white);font-family:var(--font-display)}
+#topbar-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.topbar-stat{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:5px 10px;border-radius:8px;background:var(--glass);border:1px solid var(--border)}
+.topbar-stat svg{width:13px;height:13px}
+.coin-badge{color:var(--coin)}
+.xp-badge{color:var(--text2)}
+
+/* ══════════════════════════
+   CONTENT + PANELS
+══════════════════════════ */
+#content{flex:1;overflow:hidden;position:relative}
+.panel{position:absolute;inset:0;overflow-y:auto;padding:24px;display:none;animation:panIn var(--anim) cubic-bezier(0.4,0,0.2,1)}
+.panel.active{display:block}
+@keyframes panIn{from{opacity:0;transform:translateY(10px) scale(0.99)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+/* ══════════════════════════
+   GLASS CARD
+══════════════════════════ */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);transition:border-color var(--anim)}
+.card:hover{border-color:var(--border2)}
+.glass-card{background:var(--glass);backdrop-filter:blur(var(--blur));-webkit-backdrop-filter:blur(var(--blur));border:1px solid var(--border2);border-radius:var(--radius)}
+.ch{display:flex;align-items:center;gap:9px;padding:13px 16px;border-bottom:1px solid var(--border);font-weight:600;font-size:13px}
+.ch svg{width:15px;height:15px;color:var(--text2);flex-shrink:0}
+.cb{padding:16px}
+
+/* ══════════════════════════
+   LIQUID GLASS EFFECT
+══════════════════════════ */
+.liquid-glass{
+  background:rgba(255,255,255,0.04);
+  backdrop-filter:blur(24px) saturate(180%);
+  -webkit-backdrop-filter:blur(24px) saturate(180%);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:var(--radius);
+  box-shadow:0 8px 32px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.08);
+}
+.light .liquid-glass{
+  background:rgba(255,255,255,0.6);
+  border:1px solid rgba(0,0,0,0.08);
+  box-shadow:0 8px 32px rgba(0,0,0,0.1),inset 0 1px 0 rgba(255,255,255,0.9);
+}
+
+/* ══════════════════════════
+   TYPOGRAPHY
+══════════════════════════ */
+.ptitle{font-size:24px;font-weight:800;color:var(--white);letter-spacing:-.5px;margin-bottom:4px;font-family:var(--font-display)}
+.psub{font-size:13px;color:var(--text2);margin-bottom:22px}
+
+/* ══════════════════════════
+   GRID
+══════════════════════════ */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(max-width:800px){.g3,.g4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.g2,.g3,.g4{grid-template-columns:1fr}}
+
+/* ══════════════════════════
+   BUTTONS
+══════════════════════════ */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:9px;border:none;cursor:pointer;font-family:var(--font);font-size:13px;font-weight:600;transition:all var(--anim-fast);white-space:nowrap;position:relative;overflow:hidden}
+.btn::after{content:'';position:absolute;inset:0;background:transparent;transition:background var(--anim-fast)}
+.btn:hover::after{background:rgba(255,255,255,0.07)}
+.btn svg{width:14px;height:14px;flex-shrink:0}
+.btn-p{background:var(--white);color:var(--black)}
+.btn-p:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(255,255,255,0.15)}
+.btn-g{background:var(--glass);color:var(--text);border:1px solid var(--border)}
+.btn-g:hover{background:var(--glass2);border-color:var(--border2)}
+.btn-d{background:var(--bg3);color:var(--text);border:1px solid var(--border2)}
+.btn-coin{background:var(--coin-dim);color:var(--coin);border:1px solid rgba(245,197,24,0.25)}
+.btn-coin:hover{background:rgba(245,197,24,0.22)}
+.btn-sm{padding:6px 12px;font-size:12px;border-radius:8px}
+.btn-ico{width:32px;height:32px;padding:0;justify-content:center}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none!important}
+/* ripple */
+.btn-ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,0.3);transform:scale(0);animation:ripple 0.5s ease-out;pointer-events:none}
+@keyframes ripple{to{transform:scale(4);opacity:0}}
+
+/* ══════════════════════════
+   CUSTOM DROPDOWN
+══════════════════════════ */
+.dd-wrap{position:relative;display:inline-block}
+.dd-trigger{display:flex;align-items:center;gap:6px;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:9px;cursor:pointer;font-size:13px;color:var(--text);font-family:var(--font);transition:border-color var(--anim-fast);user-select:none;min-width:120px;justify-content:space-between}
+.dd-trigger:hover{border-color:var(--border2)}
+.dd-trigger svg.dd-arrow{width:13px;height:13px;color:var(--text2);transition:transform var(--anim-fast);flex-shrink:0}
+.dd-trigger.open svg.dd-arrow{transform:rotate(180deg)}
+.dd-menu{position:absolute;top:calc(100% + 6px);left:0;min-width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;box-shadow:var(--shadow-lg);z-index:500;overflow:hidden;animation:ddIn var(--anim-fast) ease;backdrop-filter:blur(var(--blur))}
+@keyframes ddIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.dd-item{padding:9px 14px;font-size:13px;cursor:pointer;transition:background var(--anim-fast);display:flex;align-items:center;gap:8px;color:var(--text)}
+.dd-item:hover{background:var(--glass2)}
+.dd-item.selected{color:var(--white);font-weight:600}
+
+/* ══════════════════════════
+   FORM ELEMENTS
+══════════════════════════ */
+.inp,.ta{background:var(--bg3);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:var(--font);font-size:13px;padding:9px 12px;outline:none;width:100%;transition:border-color var(--anim-fast),box-shadow var(--anim-fast)}
+.inp:focus,.ta:focus{border-color:var(--border3);box-shadow:0 0 0 3px rgba(255,255,255,0.05)}
+.ta{resize:vertical;min-height:80px;line-height:1.6}
+.ig{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.lbl{font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.7px}
+
+/* Toggle */
+.toggle{width:40px;height:22px;border-radius:11px;background:var(--bg5);cursor:pointer;position:relative;transition:background var(--anim);flex-shrink:0;border:1px solid var(--border)}
+.toggle.on{background:var(--white)}
+.toggle::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:var(--text3);top:2px;left:2px;transition:transform var(--anim),background var(--anim);box-shadow:0 1px 4px rgba(0,0,0,.6)}
+.toggle.on::after{transform:translateX(18px);background:var(--black)}
+
+/* Range */
+input[type=range]{-webkit-appearance:none;height:4px;border-radius:2px;background:var(--bg5);outline:none;cursor:pointer;width:100%}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--white);cursor:pointer;box-shadow:0 1px 6px rgba(0,0,0,.8);transition:transform var(--anim-fast)}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
+
+/* Progress */
+.prog{background:var(--bg4);border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;border-radius:99px;background:var(--white);transition:width .6s cubic-bezier(0.4,0,0.2,1)}
+
+/* ══════════════════════════
+   NOTIFICATIONS
+══════════════════════════ */
+#notif{position:fixed;bottom:20px;right:20px;z-index:5000;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.nitem{background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:11px 16px;min-width:220px;max-width:300px;display:flex;align-items:center;gap:10px;font-size:13px;animation:nIn .28s cubic-bezier(0.34,1.56,0.64,1);box-shadow:var(--shadow);pointer-events:all}
+.nitem svg{width:15px;height:15px;flex-shrink:0}
+.nitem.coin{border-color:rgba(245,197,24,0.3);color:var(--coin)}
+@keyframes nIn{from{opacity:0;transform:translateX(20px) scale(0.9)}to{opacity:1;transform:translateX(0) scale(1)}}
+
+/* ══════════════════════════
+   CMD PALETTE
+══════════════════════════ */
+#cmdpal{position:fixed;inset:0;z-index:3000;display:none;background:rgba(0,0,0,0.7);backdrop-filter:blur(16px);align-items:flex-start;justify-content:center;padding-top:13vh}
+#cmdpal.open{display:flex}
+#cmdpal-box{width:540px;max-width:92vw;background:var(--bg2);border:1px solid var(--border2);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-lg);animation:cmdIn .22s cubic-bezier(0.34,1.56,0.64,1)}
+@keyframes cmdIn{from{opacity:0;transform:scale(0.94) translateY(-10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+#cmdpal-inp{width:100%;background:none;border:none;outline:none;font-size:15px;padding:16px 18px;color:var(--text);font-family:var(--font);border-bottom:1px solid var(--border)}
+.cmd-r{padding:6px 10px 10px;max-height:300px;overflow-y:auto}
+.cmd-i{padding:9px 11px;border-radius:9px;cursor:pointer;display:flex;align-items:center;gap:10px;font-size:13px;transition:background var(--anim-fast)}
+.cmd-i:hover,.cmd-i.sel{background:var(--glass2)}
+.cmd-ico{width:26px;height:26px;border-radius:7px;background:var(--bg4);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cmd-ico svg{width:13px;height:13px}
+
+/* ══════════════════════════
+   STATS
+══════════════════════════ */
+.stat-card{padding:18px;border-radius:var(--radius);background:var(--bg2);border:1px solid var(--border);text-align:center;transition:transform var(--anim-fast),border-color var(--anim-fast)}
+.stat-card:hover{transform:translateY(-2px);border-color:var(--border2)}
+.stat-n{font-size:32px;font-weight:800;color:var(--white);font-family:var(--font-display)}
+.stat-l{font-size:11px;color:var(--text2);margin-top:3px;text-transform:uppercase;letter-spacing:.7px}
+
+/* Quick action */
+.qa{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:18px;border-radius:var(--radius);cursor:pointer;border:1px solid var(--border);background:var(--bg2);transition:all var(--anim-fast);text-align:center}
+.qa:hover{background:var(--bg3);border-color:var(--border2);transform:translateY(-3px);box-shadow:var(--shadow)}
+.qa-ico{width:38px;height:38px;border-radius:10px;background:var(--bg3);display:flex;align-items:center;justify-content:center;transition:background var(--anim-fast)}
+.qa:hover .qa-ico{background:var(--bg4)}
+.qa-ico svg{width:18px;height:18px;color:var(--white)}
+.qa-lbl{font-size:12px;font-weight:600;color:var(--text2)}
+
+/* ══════════════════════════
+   CHAT
+══════════════════════════ */
+#chat-msgs{height:350px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding:16px;scroll-behavior:smooth}
+.msg{display:flex;gap:10px;animation:msgIn .2s ease}
+@keyframes msgIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{flex-direction:row-reverse}
+.mav{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;overflow:hidden}
+.msg.user .mav{background:var(--white);color:var(--black)}
+.msg.ai .mav{background:var(--bg4);color:var(--text2);border:1px solid var(--border)}
+.mav img{width:100%;height:100%;object-fit:cover}
+.mbub{max-width:76%;padding:10px 14px;border-radius:16px;font-size:13px;line-height:1.6;position:relative}
+.msg.user .mbub{background:var(--white);color:var(--black);border-radius:16px 4px 16px 16px}
+.msg.ai .mbub{background:var(--bg3);border:1px solid var(--border);border-radius:4px 16px 16px 16px}
+.mbub code{font-family:var(--font-mono);background:var(--bg4);padding:2px 6px;border-radius:4px;font-size:12px}
+.mbub strong{color:var(--white);font-weight:700}
+.msg-edit-btn{position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:6px;background:var(--bg4);border:none;cursor:pointer;display:none;align-items:center;justify-content:center;color:var(--text2)}
+.msg:hover .msg-edit-btn{display:flex}
+.msg-edit-btn svg{width:11px;height:11px}
+#chat-row{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--border);align-items:flex-end}
+#chat-inp{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font);font-size:13px;padding:9px 12px;outline:none;resize:none;min-height:38px;max-height:100px;line-height:1.5;transition:border-color var(--anim-fast)}
+#chat-inp:focus{border-color:var(--border2)}
+.tdot{width:6px;height:6px;border-radius:50%;background:var(--text2);animation:td 1.2s infinite;display:inline-block;margin:0 2px}
+.tdot:nth-child(2){animation-delay:.2s}.tdot:nth-child(3){animation-delay:.4s}
+@keyframes td{0%,80%,100%{transform:scale(.8);opacity:.4}40%{transform:scale(1.1);opacity:1}}
+/* Chat sessions */
+.chat-session{padding:9px 12px;border-radius:9px;cursor:pointer;transition:background var(--anim-fast);border:1px solid transparent;margin-bottom:5px;display:flex;align-items:center;gap:8px}
+.chat-session:hover{background:var(--glass);border-color:var(--border)}
+.chat-session.active{background:var(--glass2);border-color:var(--border2)}
+.cs-name{font-size:13px;font-weight:500;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cs-date{font-size:11px;color:var(--text3)}
+
+/* ══════════════════════════
+   NOTES
+══════════════════════════ */
+.note-item{padding:10px 12px;border-radius:9px;cursor:pointer;transition:all var(--anim-fast);border:1px solid transparent;margin-bottom:6px}
+.note-item:hover{background:var(--glass);border-color:var(--border)}
+.note-item.active{background:var(--glass2);border-color:var(--border2)}
+.note-t{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.note-p{font-size:12px;color:var(--text2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.note-date{font-size:10px;color:var(--text3);margin-top:3px}
+/* Rich text toolbar */
+.editor-toolbar{display:flex;gap:4px;padding:8px 12px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.etb-btn{width:28px;height:28px;border-radius:6px;border:none;background:none;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;transition:background var(--anim-fast),color var(--anim-fast)}
+.etb-btn:hover{background:var(--glass2);color:var(--text)}
+.etb-btn.active{background:var(--white);color:var(--black)}
+.etb-sep{width:1px;background:var(--border);margin:0 3px}
+#note-editor{flex:1;min-height:300px;outline:none;padding:14px 16px;font-size:14px;line-height:1.7;color:var(--text);font-family:var(--font);overflow-y:auto}
+#note-editor:empty::before{content:'Start writing your note here…';color:var(--text3);pointer-events:none}
+#note-editor img{max-width:100%;border-radius:8px;cursor:pointer}
+
+/* ══════════════════════════
+   TASKS
+══════════════════════════ */
+.task-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:1px solid var(--border);margin-bottom:7px;background:var(--bg2);transition:all var(--anim-fast)}
+.task-item.done{opacity:.4}
+.task-item.done .task-n{text-decoration:line-through}
+.tck{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border2);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all var(--anim-fast)}
+.tck.on{background:var(--white);border-color:var(--white)}
+.tck svg{width:10px;height:10px;color:var(--black)}
+.task-n{flex:1;font-size:13px}
+.task-m{font-size:11px;color:var(--text3)}
+
+/* ══════════════════════════
+   SETTINGS
+══════════════════════════ */
+.srow{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+.srow:last-child{border-bottom:none}
+.srow-l{font-size:13px;font-weight:500}
+.srow-d{font-size:11px;color:var(--text2);margin-top:2px}
+/* Settings preview */
+#settings-preview{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:20px;margin-bottom:16px;min-height:140px;position:relative;overflow:hidden;transition:all var(--anim)}
+.preview-chrome{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)}
+.preview-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:12px}
+.preview-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;background:var(--white);color:var(--black);font-size:11px;font-weight:700;margin-top:8px}
+/* Profile */
+.profile-avatar{width:80px;height:80px;border-radius:50%;background:var(--bg3);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;overflow:hidden;cursor:pointer;transition:border-color var(--anim-fast);position:relative}
+.profile-avatar:hover{border-color:var(--border3)}
+.profile-avatar img{width:100%;height:100%;object-fit:cover}
+.avatar-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;border-radius:50%}
+.profile-avatar:hover .avatar-overlay{display:flex}
+.avatar-overlay svg{width:20px;height:20px;color:#fff}
+
+/* ══════════════════════════
+   CALENDAR
+══════════════════════════ */
+.cal-g{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-hdr{font-size:10px;color:var(--text3);text-align:center;padding:3px;font-weight:600}
+.cal-day{aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;transition:background var(--anim-fast);color:var(--text2);position:relative}
+.cal-day:hover{background:var(--glass)}
+.cal-day.today{background:var(--white);color:var(--black);font-weight:700}
+.cal-day.has-task::after{content:'';position:absolute;bottom:2px;width:3px;height:3px;border-radius:50%;background:var(--text2)}
+.cal-day.logged-in{background:var(--glass2);color:var(--white)}
+
+/* ══════════════════════════
+   CONVERTER
+══════════════════════════ */
+.conv-row{display:grid;grid-template-columns:1fr 28px 1fr;gap:8px;align-items:end;margin-bottom:12px}
+.conv-arr{display:flex;align-items:center;justify-content:center;color:var(--text2);padding-bottom:10px}
+.res-box{background:var(--bg3);border:1px solid var(--border2);border-radius:9px;padding:14px;text-align:center}
+.res-val{font-size:26px;font-weight:800;color:var(--white);font-family:var(--font-display)}
+.res-unit{font-size:12px;color:var(--text2);margin-top:3px}
+/* Calculator */
+#calc-display{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px 16px;text-align:right;margin-bottom:10px}
+#calc-expr{font-size:13px;color:var(--text2);min-height:20px}
+#calc-result{font-size:32px;font-weight:800;color:var(--white);font-family:var(--font-display)}
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.calc-btn{padding:14px;border-radius:9px;border:none;font-size:15px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all var(--anim-fast);background:var(--bg3);color:var(--text)}
+.calc-btn:hover{background:var(--bg4);transform:scale(0.97)}
+.calc-btn.op{background:var(--bg4);color:var(--white)}
+.calc-btn.eq{background:var(--white);color:var(--black)}
+.calc-btn.eq:hover{background:#ddd}
+.calc-btn.clear{background:var(--bg4);color:var(--text2)}
+
+/* ══════════════════════════
+   FILE CONVERTER
+══════════════════════════ */
+.drop-z{border:1.5px dashed var(--border2);border-radius:var(--radius);padding:32px;text-align:center;cursor:pointer;transition:all var(--anim);color:var(--text2)}
+.drop-z:hover,.drop-z.drag{border-color:var(--white);background:var(--accent-dim);color:var(--text)}
+.drop-z svg{width:32px;height:32px;margin-bottom:10px;opacity:.35}
+.img-prev img{max-width:100%;max-height:160px;border-radius:8px;border:1px solid var(--border)}
+.dl-btn{display:inline-flex;align-items:center;gap:7px;padding:8px 14px;background:var(--white);color:var(--black);border-radius:9px;font-size:13px;font-weight:700;text-decoration:none;cursor:pointer}
+
+/* ══════════════════════════
+   GAMIFICATION
+══════════════════════════ */
+.lvl-badge{display:flex;align-items:center;gap:16px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+.lvl-num{font-size:44px;font-weight:900;color:var(--white);font-family:var(--font-display);line-height:1}
+.quest-item{display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:10px;background:var(--bg3);border:1px solid var(--border);margin-bottom:7px;transition:border-color var(--anim-fast)}
+.quest-item:hover{border-color:var(--border2)}
+.ach-item{display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:10px;background:var(--bg3);border:1px solid var(--border);margin-bottom:7px;transition:all var(--anim-fast)}
+.ach-item:hover{transform:translateX(3px);border-color:var(--border2)}
+.ach-item.unlocked{border-color:rgba(245,197,24,0.2);background:rgba(245,197,24,0.04)}
+/* Shop */
+.shop-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center;transition:all var(--anim-fast)}
+.shop-item:hover{border-color:var(--border2);transform:translateY(-2px)}
+.shop-icon{font-size:32px;margin-bottom:8px}
+.shop-name{font-size:13px;font-weight:700;margin-bottom:4px}
+.shop-desc{font-size:11px;color:var(--text2);margin-bottom:10px}
+.shop-price{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:var(--coin)}
+
+/* ══════════════════════════
+   GAME (2D Zombie Shooter)
+══════════════════════════ */
+#game-canvas{border-radius:var(--radius);border:1px solid var(--border2);background:#0a0a0a;cursor:crosshair;display:block;width:100%;touch-action:none}
+#game-hud{display:flex;gap:12px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.hud-stat{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:6px 12px;border-radius:8px;background:var(--bg3);border:1px solid var(--border)}
+
+/* ══════════════════════════
+   LOGIN STREAK
+══════════════════════════ */
+.streak-day{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:1px solid var(--border);color:var(--text3)}
+.streak-day.done{background:var(--white);color:var(--black);border-color:var(--white)}
+.streak-day.today{border-color:var(--border2);color:var(--text)}
+
+/* ══════════════════════════
+   BACKGROUND CUSTOMIZER
+══════════════════════════ */
+#bg-layer{position:fixed;inset:0;z-index:0;pointer-events:none;transition:all var(--anim-slow)}
+.draggable-img{position:fixed;cursor:move;user-select:none;z-index:1;border-radius:8px;box-shadow:var(--shadow)}
+.draggable-img .img-controls{position:absolute;top:-36px;left:0;display:flex;gap:4px;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:4px;opacity:0;transition:opacity var(--anim-fast)}
+.draggable-img:hover .img-controls{opacity:1}
+.ic-btn{width:26px;height:26px;border-radius:6px;border:none;background:var(--bg4);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px}
+.ic-btn:hover{background:var(--bg5);color:var(--text)}
+
+/* ══════════════════════════
+   CREDIT TAB
+══════════════════════════ */
+.credit-card{text-align:center;padding:32px;background:var(--bg2);border:1px solid var(--border);border-radius:20px;margin-bottom:14px}
+.credit-avatar{width:80px;height:80px;border-radius:50%;background:var(--bg3);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 16px}
+.credit-name{font-size:22px;font-weight:800;font-family:var(--font-display)}
+.credit-link{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:var(--glass);border:1px solid var(--border);font-size:12px;color:var(--text2);margin:4px;text-decoration:none;transition:all var(--anim-fast)}
+.credit-link:hover{background:var(--glass2);color:var(--text)}
+
+/* ══════════════════════════
+   GUIDE TAB
+══════════════════════════ */
+.guide-step{display:flex;gap:14px;padding:14px;border-radius:var(--radius);background:var(--bg2);border:1px solid var(--border);margin-bottom:10px;transition:border-color var(--anim-fast)}
+.guide-step:hover{border-color:var(--border2)}
+.guide-num{width:32px;height:32px;border-radius:50%;background:var(--white);color:var(--black);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0;font-family:var(--font-display)}
+.guide-info h3{font-size:14px;font-weight:700;margin-bottom:4px}
+.guide-info p{font-size:13px;color:var(--text2);line-height:1.6}
+
+/* ══════════════════════════
+   FILE RESULT
+══════════════════════════ */
+.file-result{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:10px}
+.file-result pre{font-family:var(--font-mono);font-size:11px;white-space:pre-wrap;word-break:break-word;line-height:1.5;max-height:200px;overflow-y:auto;color:var(--text2)}
+
+/* ══════════════════════════
+   SPINNER
+══════════════════════════ */
+.spin{width:18px;height:18px;border:2px solid var(--border2);border-top-color:var(--white);border-radius:50%;animation:sp .7s linear infinite;flex-shrink:0}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* ══════════════════════════
+   STORY GAME
+══════════════════════════ */
+.story-box{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:20px;margin-bottom:12px;min-height:120px;line-height:1.8;font-size:14px}
+.story-choice{display:block;width:100%;text-align:left;padding:11px 16px;margin-bottom:7px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font);font-size:13px;cursor:pointer;transition:all var(--anim-fast)}
+.story-choice:hover{background:var(--bg4);border-color:var(--border2);transform:translateX(4px)}
+
+/* ══════════════════════════
+   MISC
+══════════════════════════ */
+.chip{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600;background:var(--glass);border:1px solid var(--border)}
+.fmtSz-badge{font-size:11px;color:var(--text2);background:var(--bg4);border-radius:6px;padding:2px 7px}
+</style>
+</head>
+<body>
+
+<!-- ══ LOADING SCREEN ══ -->
+<div id="loader">
+  <div id="loader-venus-wrap">
+    <div id="loader-venus"></div>
+  </div>
+  <div id="loader-title">
+    <span id="loader-ven">Ven</span>
+    <span id="loader-mid"><div id="loader-planet"></div></span>
+    <span id="loader-ra">ra</span>
+  </div>
+  <div id="loader-sub">AI Learning System</div>
+  <div id="loader-bar"><div id="loader-bar-fill"></div></div>
+</div>
+
+<!-- ══ AUTH SCREEN ══ -->
+<div id="auth-screen">
+  <div class="auth-box liquid-glass">
+    <div class="auth-logo">
+      <div class="auth-logo-icon">V</div>
+      <div class="auth-title" id="auth-title-text">Welcome to Venora</div>
+      <div class="auth-sub" id="auth-sub-text">Sign in to sync your learning progress</div>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="authTab('login')" id="auth-tab-login" data-i18n="login">Login</button>
+      <button class="auth-tab" onclick="authTab('register')" id="auth-tab-reg" data-i18n="register">Register</button>
+    </div>
+    <div class="ig"><label class="lbl" data-i18n="username">Username</label><input class="inp" id="auth-user" placeholder="e.g. w1201s" autocomplete="username"/></div>
+    <div class="ig" id="auth-nick-wrap" style="display:none"><label class="lbl" data-i18n="nickname">Nickname</label><input class="inp" id="auth-nick" placeholder="Display name"/></div>
+    <div class="ig"><label class="lbl" data-i18n="password">Password</label><input class="inp" type="password" id="auth-pass" placeholder="••••••••" autocomplete="current-password"/></div>
+    <div class="auth-err" id="auth-err"></div>
+    <button class="btn btn-p" style="width:100%;margin-top:4px;justify-content:center" onclick="authSubmit()" id="auth-btn">Sign In</button>
+    <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:12px" id="auth-switch-text">Don't have an account? <span style="color:var(--text2);cursor:pointer;text-decoration:underline" onclick="authTab('register')">Register</span></div>
+  </div>
+</div>
+
+<!-- ══ NOTIFICATIONS ══ -->
+<div id="notif"></div>
+
+<!-- ══ CMD PALETTE ══ -->
+<div id="cmdpal" onclick="if(event.target.id==='cmdpal')closeCmd()">
+  <div id="cmdpal-box">
+    <input id="cmdpal-inp" placeholder="Search tabs, commands…" autocomplete="off"/>
+    <div class="cmd-r" id="cmd-results"></div>
+  </div>
+</div>
+
+<!-- ══ BG LAYER ══ -->
+<div id="bg-layer"></div>
+
+<!-- ══ CLICK SOUND ══ -->
+<audio id="click-snd" preload="auto">
+  <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFkZSXmZuenJ2dnJ2enJ2am5mXlZORj42LiYeEgoB+fHp4d3Z1dHNycXFwcHBwcXJzdHV3eHp8fn+Ch4qNkJKUlpaXl5eXlpaUkpCNioeFgn96d3RxbmtpZmVjYmFhYWFiY2RmZ2lrbW9xc3Z4e32AgoSHioyOkJGSk5OTkpGQjouIhIF+e3h1cm9tamdlY2FgX19fYGFiZGVnaWtub3FzdXd6fH6Ag4WHiYuMjY6Ojo2Mi4mHhYKAfXp3dHFuamhnZWNiYWBgYGBhYmNlZmhqbG5wcnV3eXx+gIKEhoeJiouLi4qKiYiHhoSCgH57eHVyb2xqZ2VjYmBgYGBgYWJjZGZnaWttb3Fyc3V4ent9f4CCg4WGh4iIiIiHh4aFhIKAf317eXZ0cW9ta2loZ2ZlZWVlZmZnaGlrbW9wcnN1d3l6fH5/gYKDhIWFhYWEhIOCgYB/fn18e3p5d3V0cnFvbmxtbGxsbGxsbW1ub3BxcnN0dXZ4eXp7fH1+f4CBgoODg4ODgoKBgYB/f359fHt6eXh3dnV0c3JxcHBwcHBwcXFycnNzdHR1dnd4eXp7fH19fn9/gIGBgYKCgoGBgYCAgIB/f39+fn5+fn5+fn5+f3+AgIGBgYGBgYGBgoKCgoKBgYGBgICAgICAgIB/f39/f39/f39/f4CAgICBgYGBgYKCgoKCgoKCgYGBgYGBgYGBgICAgICAgH9/f39/f39/f39/f39/gICAgICAgICBgYGBgYGBgYGBgYGBgYGBgYGAgICAgICAgICAgICAgICAf39/f39/f39/f39/f39/f3+AgICAgICAgICAgICAgICAgICAgICAgICAgA==" type="audio/wav"/>
+</audio>
+
+<div id="shell">
+  <!-- ══ SIDEBAR ══ -->
+  <div id="sidebar">
+    <div id="sidebar-top">
+      <div id="logo-wrap">
+        <div id="logo-icon">V</div>
+        <span id="logo-text">Venora</span>
+      </div>
+      <button id="tog-btn" onclick="toggleSidebar()" title="Toggle sidebar">
+        <i data-lucide="chevrons-left"></i>
+      </button>
+    </div>
+    <div id="sidebar-user" onclick="goTab('account')">
+      <div class="su-avatar" id="su-av">U</div>
+      <div class="su-info">
+        <div class="su-name" id="su-name">User</div>
+        <div class="su-coins"><span id="su-coins">0</span> ◈ coins</div>
+      </div>
+    </div>
+    <nav id="nav"></nav>
+    <div id="sidebar-bot">
+      <button class="nav-item" onclick="goTab('account')" data-tab="account">
+        <span class="ni-icon"><i data-lucide="user"></i></span>
+        <span class="ni-lbl" data-i18n="account">Account</span>
+      </button>
+      <button class="nav-item" onclick="goTab('settings')" data-tab="settings">
+        <span class="ni-icon"><i data-lucide="settings"></i></span>
+        <span class="ni-lbl" data-i18n="settings">Settings</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ MAIN ══ -->
+  <div id="main">
+    <div id="topbar">
+      <div id="page-title">Study Hub</div>
+      <div id="topbar-right">
+        <div class="topbar-stat xp-badge">
+          <i data-lucide="zap"></i>
+          <span id="tb-xp">0 XP</span>
+        </div>
+        <div class="topbar-stat coin-badge">
+          <i data-lucide="circle-dollar-sign"></i>
+          <span id="tb-coins">0</span>
+        </div>
+        <button class="btn btn-g btn-sm" onclick="openCmd()">
+          <i data-lucide="search"></i>
+          <kbd style="font-size:10px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;padding:1px 5px;color:var(--text2)">⌘K</kbd>
+        </button>
+      </div>
+    </div>
+    <div id="content">
+
+      <!-- ═══════ STUDY HUB ═══════ -->
+      <div class="panel active" data-panel="study">
+        <div class="ptitle" data-i18n="study_hub">Study Hub</div>
+        <div class="psub" data-i18n="study_sub">Your AI-powered command center</div>
+        <div class="g4" style="margin-bottom:16px">
+          <div class="stat-card"><div class="stat-n" id="s-xp">0</div><div class="stat-l" data-i18n="total_xp">Total XP</div></div>
+          <div class="stat-card"><div class="stat-n" id="s-tasks">0</div><div class="stat-l" data-i18n="tasks_done">Tasks Done</div></div>
+          <div class="stat-card"><div class="stat-n" id="s-notes">0</div><div class="stat-l" data-i18n="notes">Notes</div></div>
+          <div class="stat-card"><div class="stat-n coin-badge" id="s-coins">0</div><div class="stat-l" data-i18n="coins">Coins</div></div>
+        </div>
+        <div class="card" style="margin-bottom:14px">
+          <div class="ch"><i data-lucide="zap"></i> <span data-i18n="quick_actions">Quick Actions</span></div>
+          <div class="cb">
+            <div class="g4">
+              <div class="qa" onclick="goTab('ai')"><div class="qa-ico"><i data-lucide="message-circle"></i></div><div class="qa-lbl" data-i18n="ai_tab">AI</div></div>
+              <div class="qa" onclick="goTab('notes')"><div class="qa-ico"><i data-lucide="file-text"></i></div><div class="qa-lbl" data-i18n="notes">Notes</div></div>
+              <div class="qa" onclick="goTab('homework')"><div class="qa-ico"><i data-lucide="check-square"></i></div><div class="qa-lbl" data-i18n="homework">Homework</div></div>
+              <div class="qa" onclick="goTab('converter')"><div class="qa-ico"><i data-lucide="calculator"></i></div><div class="qa-lbl" data-i18n="converter">Converter</div></div>
+              <div class="qa" onclick="goTab('fileconv')"><div class="qa-ico"><i data-lucide="file-down"></i></div><div class="qa-lbl" data-i18n="file_convert">File Convert</div></div>
+              <div class="qa" onclick="goTab('gamification')"><div class="qa-ico"><i data-lucide="trophy"></i></div><div class="qa-lbl" data-i18n="rewards">Rewards</div></div>
+              <div class="qa" onclick="goTab('game')"><div class="qa-ico"><i data-lucide="gamepad-2"></i></div><div class="qa-lbl" data-i18n="game">Game</div></div>
+              <div class="qa" onclick="goTab('story')"><div class="qa-ico"><i data-lucide="book-open"></i></div><div class="qa-lbl" data-i18n="story">Story</div></div>
+            </div>
+          </div>
+        </div>
+        <!-- Login streak -->
+        <div class="card" style="margin-bottom:14px">
+          <div class="ch"><i data-lucide="flame"></i> <span data-i18n="daily_streak">Daily Login Streak</span> <span id="streak-count" style="margin-left:auto;font-size:12px;color:var(--coin)" class="coin-badge">🔥 0 days</span></div>
+          <div class="cb">
+            <div style="display:flex;gap:6px;flex-wrap:wrap" id="streak-display"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ch"><i data-lucide="bar-chart-2"></i> <span data-i18n="todays_progress">Today's XP Progress</span></div>
+          <div class="cb">
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+              <span style="font-size:12px;color:var(--text2)" data-i18n="daily_goal">Daily Goal</span>
+              <span style="font-size:12px;font-weight:600" id="xp-lbl">0 / 200 XP</span>
+            </div>
+            <div class="prog" style="height:6px"><div class="prog-fill" id="xp-bar" style="width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════ AI TAB ═══════ -->
+      <div class="panel" data-panel="ai">
+        <div class="ptitle" data-i18n="ai_tab">AI <span style="font-size:13px;color:var(--text2);font-weight:400">(work in progress)</span></div>
+        <div class="g2">
+          <!-- Chat sessions sidebar -->
+          <div style="max-width:220px">
+            <button class="btn btn-p btn-sm" style="width:100%;justify-content:center;margin-bottom:10px" onclick="newChatSession()">
+              <i data-lucide="plus"></i> <span data-i18n="new_chat">New Chat</span>
+            </button>
+            <div id="chat-sessions"></div>
+          </div>
+          <!-- Main chat -->
+          <div class="card" style="display:flex;flex-direction:column">
+            <div class="ch">
+              <i data-lucide="message-circle"></i>
+              <span id="chat-session-name" data-i18n="chat">Chat</span>
+              <div style="margin-left:auto;display:flex;gap:7px">
+                <div class="dd-wrap">
+                  <div class="dd-trigger" id="ai-mode-trigger" onclick="toggleDD('ai-mode-dd')">
+                    <span id="ai-mode-label">Tutor</span>
+                    <i data-lucide="chevron-down" class="dd-arrow"></i>
+                  </div>
+                  <div class="dd-menu" id="ai-mode-dd" style="display:none">
+                    <div class="dd-item selected" onclick="setAIMode('tutor','📚 Tutor')">📚 Tutor</div>
+                    <div class="dd-item" onclick="setAIMode('exam','⚡ Exam Helper')">⚡ Exam Helper</div>
+                    <div class="dd-item" onclick="setAIMode('simple','🐣 Simplify')">🐣 Simplify</div>
+                    <div class="dd-item" onclick="setAIMode('steps','🔢 Step-by-Step')">🔢 Step-by-Step</div>
+                  </div>
+                </div>
+                <button class="btn btn-g btn-sm btn-ico" onclick="clearChat()" title="Clear chat"><i data-lucide="trash-2"></i></button>
+              </div>
+            </div>
+            <div id="chat-msgs"></div>
+            <div id="chat-row">
+              <textarea id="chat-inp" placeholder="Ask anything — math, science, history, code…" rows="1"></textarea>
+              <button class="btn btn-p btn-ico" id="chat-send" onclick="sendChat()"><i data-lucide="send"></i></button>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:14px">
+          <div class="ch"><i data-lucide="zap"></i> <span data-i18n="quick_prompts">Quick Prompts</span></div>
+          <div class="cb" style="display:flex;flex-wrap:wrap;gap:7px" id="qprompts"></div>
+        </div>
+      </div>
+
+      <!-- ═══════ NOTES ═══════ -->
+      <div class="panel" data-panel="notes">
+        <div class="ptitle" data-i18n="notes">Notes</div>
+        <div class="g2">
+          <div>
+            <div style="display:flex;gap:7px;margin-bottom:10px">
+              <button class="btn btn-p btn-sm" onclick="newNote()"><i data-lucide="plus"></i> <span data-i18n="new_note">New</span></button>
+              <button class="btn btn-g btn-sm" onclick="exportNote()"><i data-lucide="download"></i> <span data-i18n="export">Export</span></button>
+            </div>
+            <div id="notes-list" style="max-height:540px;overflow-y:auto"></div>
+          </div>
+          <div class="card" style="display:flex;flex-direction:column">
+            <div class="ch">
+              <input class="inp" id="note-title" placeholder="Note title…" style="border:none;background:none;padding:0;font-size:15px;font-weight:700;color:var(--white);width:100%;font-family:var(--font-display)"/>
+            </div>
+            <!-- Rich text toolbar -->
+            <div class="editor-toolbar">
+              <button class="etb-btn" onclick="fmt('bold')" title="Bold"><b>B</b></button>
+              <button class="etb-btn" onclick="fmt('italic')" title="Italic"><i>I</i></button>
+              <button class="etb-btn" onclick="fmt('underline')" title="Underline"><u>U</u></button>
+              <div class="etb-sep"></div>
+              <button class="etb-btn" onclick="fmt('insertUnorderedList')" title="Bullet list"><i data-lucide="list"></i></button>
+              <button class="etb-btn" onclick="fmt('insertOrderedList')" title="Numbered list"><i data-lucide="list-ordered"></i></button>
+              <div class="etb-sep"></div>
+              <button class="etb-btn" onclick="fmt('formatBlock','h2')" title="Heading">H</button>
+              <button class="etb-btn" onclick="fmt('formatBlock','blockquote')" title="Quote">"</button>
+              <div class="etb-sep"></div>
+              <button class="etb-btn" onclick="insertNoteImg()" title="Insert image"><i data-lucide="image"></i></button>
+              <button class="etb-btn" onclick="aiNoteAI()" title="AI assist" style="margin-left:auto"><i data-lucide="sparkles"></i></button>
+            </div>
+            <div id="note-editor" contenteditable="true" spellcheck="true"></div>
+            <div style="display:flex;gap:7px;padding:10px 14px;border-top:1px solid var(--border)">
+              <button class="btn btn-p btn-sm" onclick="saveNote()"><i data-lucide="save"></i> <span data-i18n="save">Save</span></button>
+              <button class="btn btn-g btn-sm" onclick="delNote()"><i data-lucide="trash"></i></button>
+              <span style="font-size:11px;color:var(--text3);display:flex;align-items:center;margin-left:auto" id="note-saved-lbl"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════ HOMEWORK ═══════ -->
+      <div class="panel" data-panel="homework">
+        <div class="ptitle" data-i18n="homework">Homework</div>
+        <div class="g2">
+          <div>
+            <div class="card" style="margin-bottom:12px">
+              <div class="ch"><i data-lucide="plus-circle"></i> <span data-i18n="add_task">Add Task</span></div>
+              <div class="cb">
+                <div class="ig"><label class="lbl" data-i18n="task">Task</label><input class="inp" id="t-name" placeholder="e.g. Chapter 5 math"/></div>
+                <div class="ig"><label class="lbl" data-i18n="subject">Subject</label>
+                  <div class="dd-wrap" style="width:100%">
+                    <div class="dd-trigger" id="subj-trigger" onclick="toggleDD('subj-dd')" style="width:100%">
+                      <span id="subj-val">Math</span><i data-lucide="chevron-down" class="dd-arrow"></i>
+                    </div>
+                    <div class="dd-menu" id="subj-dd" style="display:none">
+                      <div class="dd-item selected" onclick="setDD('subj','Math','Math')">📐 Math</div>
+                      <div class="dd-item" onclick="setDD('subj','Science','Science')">🔬 Science</div>
+                      <div class="dd-item" onclick="setDD('subj','English','English')">📖 English</div>
+                      <div class="dd-item" onclick="setDD('subj','History','History')">🌍 History</div>
+                      <div class="dd-item" onclick="setDD('subj','CS','CS')">💻 Computer Science</div>
+                      <div class="dd-item" onclick="setDD('subj','Art','Art')">🎨 Art</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="ig"><label class="lbl" data-i18n="due">Due</label><input class="inp" type="date" id="t-due"/></div>
+                <div class="ig"><label class="lbl" data-i18n="priority">Priority</label>
+                  <div class="dd-wrap" style="width:100%">
+                    <div class="dd-trigger" id="pri-trigger" onclick="toggleDD('pri-dd')" style="width:100%">
+                      <span id="pri-val">Medium</span><i data-lucide="chevron-down" class="dd-arrow"></i>
+                    </div>
+                    <div class="dd-menu" id="pri-dd" style="display:none">
+                      <div class="dd-item" onclick="setDD('pri','Low','Low')">🟢 Low</div>
+                      <div class="dd-item selected" onclick="setDD('pri','Medium','Medium')">🟡 Medium</div>
+                      <div class="dd-item" onclick="setDD('pri','High','High')">🔴 High</div>
+                    </div>
+                  </div>
+                </div>
+                <button class="btn btn-p" style="width:100%" onclick="addTask()"><i data-lucide="plus"></i> <span data-i18n="add_task">Add Task</span></button>
+              </div>
+            </div>
+            <div class="card">
+              <div class="ch"><i data-lucide="calendar"></i> <span data-i18n="calendar">Calendar</span></div>
+              <div class="cb" id="mini-cal"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+              <button class="btn btn-g btn-sm" onclick="filterT('all')" data-i18n="all">All</button>
+              <button class="btn btn-g btn-sm" onclick="filterT('pending')" data-i18n="pending">Pending</button>
+              <button class="btn btn-g btn-sm" onclick="filterT('done')" data-i18n="done">Done</button>
+            </div>
+            <div id="task-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════ CONVERTER ═══════ -->
+      <div class="panel" data-panel="converter">
+        <div class="ptitle" data-i18n="converter">Converter Hub</div>
+        <div class="g2">
+          <!-- Calculator -->
+          <div class="card">
+            <div class="ch"><i data-lucide="calculator"></i> <span data-i18n="calculator">Calculator</span></div>
+            <div class="cb">
+              <div id="calc-display">
+                <div id="calc-expr"></div>
+                <div id="calc-result">0</div>
+              </div>
+              <div class="calc-grid">
+                <button class="calc-btn clear" onclick="calcPress('AC')">AC</button>
+                <button class="calc-btn op" onclick="calcPress('+/-')">+/-</button>
+                <button class="calc-btn op" onclick="calcPress('%')">%</button>
+                <button class="calc-btn op" onclick="calcPress('/')">÷</button>
+                <button class="calc-btn" onclick="calcPress('7')">7</button>
+                <button class="calc-btn" onclick="calcPress('8')">8</button>
+                <button class="calc-btn" onclick="calcPress('9')">9</button>
+                <button class="calc-btn op" onclick="calcPress('*')">×</button>
+                <button class="calc-btn" onclick="calcPress('4')">4</button>
+                <button class="calc-btn" onclick="calcPress('5')">5</button>
+                <button class="calc-btn" onclick="calcPress('6')">6</button>
+                <button class="calc-btn op" onclick="calcPress('-')">−</button>
+                <button class="calc-btn" onclick="calcPress('1')">1</button>
+                <button class="calc-btn" onclick="calcPress('2')">2</button>
+                <button class="calc-btn" onclick="calcPress('3')">3</button>
+                <button class="calc-btn op" onclick="calcPress('+')">+</button>
+                <button class="calc-btn" onclick="calcPress('0')" style="grid-column:span 2">0</button>
+                <button class="calc-btn" onclick="calcPress('.')">.</button>
+                <button class="calc-btn eq" onclick="calcPress('=')">=</button>
+              </div>
+            </div>
+          </div>
+          <!-- Unit converter -->
+          <div class="card">
+            <div class="ch"><i data-lucide="ruler"></i> <span data-i18n="unit_converter">Unit Converter</span></div>
+            <div class="cb">
+              <div class="ig"><label class="lbl" data-i18n="category">Category</label>
+                <div class="dd-wrap" style="width:100%">
+                  <div class="dd-trigger" id="cv-cat-trigger" onclick="toggleDD('cv-cat-dd')" style="width:100%">
+                    <span id="cv-cat-val">Length</span><i data-lucide="chevron-down" class="dd-arrow"></i>
+                  </div>
+                  <div class="dd-menu" id="cv-cat-dd" style="display:none">
+                    <div class="dd-item selected" onclick="setCvCat('length','Length')">📏 Length</div>
+                    <div class="dd-item" onclick="setCvCat('weight','Weight')">⚖️ Weight</div>
+                    <div class="dd-item" onclick="setCvCat('temp','Temperature')">🌡️ Temperature</div>
+                    <div class="dd-item" onclick="setCvCat('speed','Speed')">💨 Speed</div>
+                    <div class="dd-item" onclick="setCvCat('area','Area')">📐 Area</div>
+                    <div class="dd-item" onclick="setCvCat('data','Data Size')">💾 Data</div>
+                    <div class="dd-item" onclick="setCvCat('fuel','Fuel Economy')">⛽ Fuel</div>
+                    <div class="dd-item" onclick="setCvCat('time','Time')">⏱️ Time</div>
+                    <div class="dd-item" onclick="setCvCat('energy','Energy')">⚡ Energy</div>
+                    <div class="dd-item" onclick="setCvCat('pressure','Pressure')">🔵 Pressure</div>
+                  </div>
+                </div>
+              </div>
+              <div class="conv-row">
+                <div>
+                  <div class="lbl" style="margin-bottom:5px" data-i18n="from">From</div>
+                  <input class="inp" type="number" id="cv-val" value="1" oninput="doConv()"/>
+                  <select class="inp" id="cv-from" style="margin-top:6px" onchange="doConv()"></select>
+                </div>
+                <div class="conv-arr"><i data-lucide="arrow-right"></i></div>
+                <div>
+                  <div class="lbl" style="margin-bottom:5px" data-i18n="to">To</div>
+                  <div class="res-box"><div class="res-val" id="cv-res">—</div><div class="res-unit" id="cv-unit">—</div></div>
+                  <select class="inp" id="cv-to" style="margin-top:6px" onchange="doConv()"></select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Text tools -->
+          <div class="card">
+            <div class="ch"><i data-lucide="code-2"></i> <span data-i18n="text_tools">Text Tools</span></div>
+            <div class="cb">
+              <div class="ig"><label class="lbl" data-i18n="tool">Tool</label>
+                <select class="inp" id="tt-tool">
+                  <option value="b64e">Base64 Encode</option><option value="b64d">Base64 Decode</option>
+                  <option value="json">Format JSON</option><option value="upper">UPPERCASE</option>
+                  <option value="lower">lowercase</option><option value="wc">Word Count</option>
+                  <option value="rev">Reverse</option><option value="url">URL Encode</option>
+                  <option value="morse">Text → Morse</option>
+                </select>
+              </div>
+              <textarea class="ta" id="tt-in" rows="3" placeholder="Input…"></textarea>
+              <button class="btn btn-p btn-sm" style="width:100%;margin:8px 0" onclick="doTT()">Process</button>
+              <textarea class="ta" id="tt-out" rows="3" readonly></textarea>
+            </div>
+          </div>
+          <!-- Color converter -->
+          <div class="card">
+            <div class="ch"><i data-lucide="palette"></i> Color Converter</div>
+            <div class="cb">
+              <div class="ig"><label class="lbl">Color</label>
+                <input type="color" id="color-pick" value="#ffffff" oninput="doColor(this.value)" style="width:100%;height:50px;border-radius:9px;cursor:pointer;border:1px solid var(--border)"/>
+              </div>
+              <div id="color-out" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;margin-top:8px"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════ FILE CONVERTER ═══════ -->
+      <div class="panel" data-panel="fileconv">
+        <div class="ptitle" data-i18n="file_convert">File Converter</div>
+        <div class="psub" data-i18n="file_convert_sub">Convert files entirely in your browser</div>
+        <div class="g2" style="margin-bottom:14px">
+          <div class="card">
+            <div class="ch"><i data-lucide="image"></i> <span data-i18n="image_converter">Image Converter</span></div>
+            <div class="cb">
+              <div class="drop-z" id="img-drop" onclick="document.getElementById('img-inp').click()">
+                <i data-lucide="upload-cloud"></i>
+                <div style="font-weight:600;margin-bottom:3px" data-i18n="drop_image">Drop image or click</div>
+                <div style="font-size:12px;color:var(--text3)">PNG · JPG · WEBP · GIF · BMP</div>
+                <input type="file" id="img-inp" style="display:none" accept="image/*" onchange="loadImg(this)"/>
+              </div>
+              <div class="ig" style="margin-top:12px"><label class="lbl" data-i18n="convert_to">Convert To</label>
+                <select class="inp" id="img-fmt">
+                  <option value="image/png">PNG</option><option value="image/jpeg">JPG</option><option value="image/webp">WEBP</option>
+                </select>
+              </div>
+              <div class="ig"><label class="lbl">Quality — <span id="img-qv">90%</span></label>
+                <input type="range" min="10" max="100" value="90" id="img-q" oninput="document.getElementById('img-qv').textContent=this.value+'%'"/>
+              </div>
+              <div class="ig"><label class="lbl" data-i18n="resize">Resize (optional)</label>
+                <div style="display:flex;gap:8px">
+                  <input class="inp" type="number" id="img-w" placeholder="W px"/>
+                  <input class="inp" type="number" id="img-h" placeholder="H px"/>
+                </div>
+              </div>
+              <button class="btn btn-p" style="width:100%" onclick="convertImg()" id="img-btn" disabled>
+                <i data-lucide="refresh-cw"></i> <span data-i18n="convert">Convert</span>
+              </button>
+              <div id="img-preview" style="margin-top:12px"></div>
+              <canvas id="cv-canvas" style="display:none"></canvas>
+            </div>
+          </div>
+          <div class="card">
+            <div class="ch"><i data-lucide="file-code"></i> <span data-i18n="data_converter">Data Converter</span></div>
+            <div class="cb">
+              <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px">
+                <button class="btn btn-g btn-sm" onclick="txtConv('csv2json')">CSV→JSON</button>
+                <button class="btn btn-g btn-sm" onclick="txtConv('json2csv')">JSON→CSV</button>
+                <button class="btn btn-g btn-sm" onclick="txtConv('md2html')">MD→HTML</button>
+                <button class="btn btn-g btn-sm" onclick="txtConv('html2txt')">HTML→Text</button>
+                <button class="btn btn-g btn-sm" onclick="txtConv('tsv2csv')">TSV→CSV</button>
+                <button class="btn btn-g btn-sm" onclick="txtConv('xml2json')">XML→JSON</button>
+              </div>
+              <textarea class="ta" id="tc-in" rows="7" placeholder="Paste content…"></textarea>
+              <textarea class="ta" id="tc-out" rows="7" readonly placeholder="Result…" style="margin-top:8px"></textarea>
+              <button class="btn btn-g btn-sm" onclick="copyTC()" style="margin-top:8px"><i data-lucide="copy"></i> Copy</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ch"><i data-lucide="sparkles"></i> <span data-i18n="ai_file_analysis">AI File Analysis</span></div>
+          <div class="cb">
+            <div class="drop-z" id="ai-drop" onclick="document.getElementById('ai-finp').click()">
+              <i data-lucide="upload-cloud"></i>
+              <div style="font-weight:600;margin-bottom:3px" data-i18n="drop_file">Drop file for AI analysis</div>
+              <div style="font-size:12px;color:var(--text3)">TXT · CSV · JSON · PDF · DOCX</div>
+              <input type="file" id="ai-finp" style="display:none" accept=".txt,.csv,.json,.pdf,.docx" onchange="handleAIFile(this)"/>
+            </div>
+            <div id="ai-file-out"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════ GAMIFICATION ═══════ -->
+      <div class="panel" data-panel="gamification">
+        <div class="ptitle" data-i18n="rewards">Rewards</div>
+        <div class="g2">
+          <div>
+            <div class="card" style="margin-bottom:12px">
+              <div class="ch"><i data-lucide="star"></i> <span data-i18n="level_xp">Level & XP</span></div>
+              <div class="cb">
+                <div class="lvl-badge">
+                  <div class="lvl-num" id="lvl-n">1</div>
+                  <div style="flex:1">
+                    <div style="font-size:15px;font-weight:700;font-family:var(--font-display)" id="lvl-t">Rookie Scholar</div>
+                    <div style="font-size:11px;color:var(--text2);margin:5px 0" id="lvl-x">0 XP</div>
+                    <div class="prog" style="height:5px"><div class="prog-fill" id="lvl-bar" style="width:0%"></div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card" style="margin-bottom:12px">
+              <div class="ch"><i data-lucide="target"></i> <span data-i18n="daily_quests">Daily Quests</span></div>
+              <div class="cb" id="quests"></div>
+            </div>
+            <div class="card">
+              <div class="ch"><i data-lucide="circle-dollar-sign"></i> <span data-i18n="coins">Coins</span> <span class="coin-badge" style="margin-left:auto;font-weight:700" id="coins-display">0 ◈</span></div>
+              <div class="cb">
+                <button class="btn btn-coin" style="width:100%" onclick="goTab('shop')"><i data-lucide="shopping-bag"></i> <span data-i18n="open_shop">Open Shop</span></button>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="ch"><i data-lucide="award"></i> <span data-i18n="achievements">Achievements</span></div>
+            <div class="cb" id="achs" style="max-height:560px;overflow-y:auto"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════ SHOP ═══════ -->
+      <div class="panel" data-panel="shop">
+        <div class="ptitle" data-i18n="shop">◈ Coin Shop</div>
+        <div class="psub">Spend your hard-earned coins on useful upgrades</div>
+        <div id="shop-grid" class="g3"></div>
+      </div>
+
+      <!-- ═══════ GAME ═══════ -->
+      <div class="panel" data-panel="game">
+        <div class="ptitle" data-i18n="game">Fun Zone</div>
+        <div class="g2">
+          <div>
+            <div class="card" style="margin-bottom:12px">
+              <div class="ch"><i data-lucide="crosshair"></i> Zombie Shooter</div>
+              <div class="cb">
+                <div id="game-hud">
+                  <div class="hud-stat">❤️ <span id="g-hp">100</span></div>
+                  <div class="hud-stat">🌊 Wave <span id="g-wave">1</span>/50</div>
+                  <div class="hud-stat">💀 Kills <span id="g-kills">0</span></div>
+                  <div class="hud-stat coin-badge">◈ <span id="g-coins">0</span></div>
+                  <button class="btn btn-p btn-sm" onclick="startGame()" id="g-start-btn">▶ Start</button>
+                </div>
+                <canvas id="game-canvas" width="600" height="350"></canvas>
+                <div style="font-size:12px;color:var(--text2);margin-top:8px">WASD/Arrow = Move · Mouse = Aim & Shoot · Touch supported</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="ch"><i data-lucide="book-open"></i> Story Game</div>
+            <div class="cb">
+              <div id="story-box" class="story-box">Press "New Story" to begin your adventure!</div>
+              <div id="story-choices"></div>
+              <button class="btn btn-p btn-sm" style="margin-top:10px" onclick="startStory()"><i data-lucide="play"></i> <span data-i18n="new_story">New Story</span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════ GUIDE ═══════ -->
+      <div class="panel" data-panel="guide">
+        <div class="ptitle" data-i18n="guide">Guide</div>
+        <div class="psub" data-i18n="guide_sub">How to use Venora — everything explained simply</div>
+        <div id="guide-content"></div>
+      </div>
+
+      <!-- ═══════ CREDITS ═══════ -->
+      <div class="panel" data-panel="credits">
+        <div class="ptitle" data-i18n="credits">Credits</div>
+        <div style="max-width:600px;margin:0 auto">
+          <div class="credit-card">
+            <div class="credit-avatar">👨‍💻</div>
+            <div class="credit-name">w1201s</div>
+            <div style="font-size:13px;color:var(--text2);margin:8px 0 16px">Creator of Venora</div>
+            <a class="credit-link" href="https://discord.com/users/wekjjwek" target="_blank"><i data-lucide="message-circle"></i> Discord: wekjjwek <span style="font-size:10px;color:var(--coin);margin-left:4px">fast reply</span></a>
+            <a class="credit-link" href="mailto:asidhah12123@gmail.com"><i data-lucide="mail"></i> asidhah12123@gmail.com <span style="font-size:10px;color:var(--text3);margin-left:4px">slow reply</span></a>
+          </div>
+          <div class="credit-card">
+            <div style="font-size:14px;font-weight:700;margin-bottom:8px">🎮 Play Roblox With Me!</div>
+            <div style="font-size:13px;color:var(--text2);line-height:1.8">
+              <div>👤 <strong>w1201s_a</strong> — current main <span style="color:var(--text3)">(no chat)</span></div>
+              <div>👤 <strong>w1201s</strong> — old main <span style="color:var(--text3)">(no chat)</span></div>
+              <div>🎤 <strong>w1201s_script</strong> — has mic and chat ✓</div>
+            </div>
+          </div>
+          <div class="credit-card">
+            <div style="font-size:24px;margin-bottom:10px">💡</div>
+            <div style="font-size:15px;font-weight:700;margin-bottom:8px">Why this was made</div>
+            <div style="font-size:13px;color:var(--text2);line-height:1.8">
+              Made this because bored 😄<br/>
+              Targeted made for sister and sister's friends 💖<br/>
+              Built with love, caffeine, and way too much free time
+            </div>
+          </div>
+          <div class="credit-card" style="padding:20px">
+            <div style="font-size:13px;color:var(--text3);line-height:1.8">
+              Venora v3.0 · Built by w1201s · Powered by Claude AI · All in one HTML file
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════ ACCOUNT ═══════ -->
+      <div class="panel" data-panel="account">
+        <div class="ptitle" data-i18n="account">Account</div>
+        <div class="g2">
+          <div class="card">
+            <div class="ch"><i data-lucide="user"></i> <span data-i18n="profile">Profile</span></div>
+            <div class="cb" style="text-align:center">
+              <div class="profile-avatar" id="profile-av" onclick="document.getElementById('av-upload').click()" style="margin:0 auto 16px">
+                <span id="profile-av-text">U</span>
+                <div class="avatar-overlay"><i data-lucide="camera"></i></div>
+              </div>
+              <input type="file" id="av-upload" style="display:none" accept="image/*" onchange="uploadAvatar(this)"/>
+              <div class="ig" style="text-align:left"><label class="lbl" data-i18n="nickname">Nickname</label>
+                <input class="inp" id="profile-nick" placeholder="Your display name"/>
+              </div>
+              <button class="btn btn-p btn-sm" onclick="saveProfile()" style="width:100%;justify-content:center"><i data-lucide="save"></i> <span data-i18n="save_profile">Save Profile</span></button>
+              <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+                <div style="font-size:12px;color:var(--text2);margin-bottom:8px">Username: <strong id="acc-username">—</strong></div>
+                <div style="font-size:12px;color:var(--text3)" id="username-cd-info"></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:12px">
+              <div class="ch"><i data-lucide="shield"></i> <span data-i18n="account_stats">Account Stats</span></div>
+              <div class="cb">
+                <div class="srow"><div class="srow-l" data-i18n="member_since">Member Since</div><div style="font-size:13px;color:var(--text2)" id="acc-created">—</div></div>
+                <div class="srow"><div class="srow-l" data-i18n="login_streak">Login Streak</div><div style="font-size:13px;font-weight:700;color:var(--coin)" id="acc-streak">0 days</div></div>
+                <div class="srow"><div class="srow-l" data-i18n="total_xp">Total XP</div><div style="font-size:13px;font-weight:700" id="acc-xp">0</div></div>
+                <div class="srow"><div class="srow-l" data-i18n="coins">Coins</div><div style="font-size:13px;font-weight:700;color:var(--coin)" id="acc-coins">0 ◈</div></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="ch"><i data-lucide="log-out"></i> <span data-i18n="switch_account">Switch Account</span></div>
+              <div class="cb">
+                <p style="font-size:13px;color:var(--text2);margin-bottom:12px" data-i18n="switch_desc">Log out and switch to a different account. Your data stays saved.</p>
+                <button class="btn btn-d btn-sm" onclick="logout()"><i data-lucide="log-out"></i> <span data-i18n="logout">Logout</span></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════ SETTINGS ═══════ -->
+      <div class="panel" data-panel="settings">
+        <div class="ptitle" data-i18n="settings">Settings</div>
+        <!-- BIG PREVIEW -->
+        <div id="settings-preview">
+          <div class="preview-chrome">
+            <div style="width:8px;height:8px;border-radius:50%;background:#ff5f57;margin-right:4px"></div>
+            <div style="width:8px;height:8px;border-radius:50%;background:#febc2e;margin-right:4px"></div>
+            <div style="width:8px;height:8px;border-radius:50%;background:#28c840"></div>
+            <span style="margin-left:10px">venora://study</span>
+          </div>
+          <div class="preview-card">
+            <div style="font-size:16px;font-weight:800;font-family:var(--font-display);margin-bottom:6px">Study Hub Preview</div>
+            <div style="font-size:12px;color:var(--text2);margin-bottom:8px">This preview updates live as you change settings below.</div>
+            <div class="preview-btn"><i data-lucide="zap" style="width:12px;height:12px"></i> Quick Action</div>
+          </div>
+        </div>
+        <div class="g2">
+          <div class="card" style="margin-bottom:12px">
+            <div class="ch"><i data-lucide="sliders"></i> <span data-i18n="display">Display</span></div>
+            <div class="cb">
+              <div class="srow">
+                <div><div class="srow-l" data-i18n="dark_mode">Dark / Light Mode</div></div>
+                <div class="toggle on" id="dark-toggle" onclick="toggleDark(this)"></div>
+              </div>
+              <div class="srow">
+                <div><div class="srow-l" data-i18n="blur">Blur Intensity</div></div>
+                <div style="display:flex;align-items:center;gap:10px;flex:1;max-width:200px">
+                  <input type="range" min="0" max="40" value="20" id="s-blur" oninput="sBlur(this.value)"/>
+                  <span id="s-blurv" style="font-size:12px;color:var(--text2);min-width:34px">20px</span>
+                </div>
+              </div>
+              <div class="srow">
+                <div><div class="srow-l" data-i18n="radius">Border Radius</div></div>
+                <div style="display:flex;align-items:center;gap:10px;flex:1;max-width:200px">
+                  <input type="range" min="0" max="28" value="13" id="s-rad" oninput="sRad(this.value)"/>
+                  <span id="s-radv" style="font-size:12px;color:var(--text2);min-width:34px">13px</span>
+                </div>
+              </div>
+              <div class="srow">
+                <div><div class="srow-l" data-i18n="font_size">Font Size</div></div>
+                <div style="display:flex;align-items:center;gap:10px;flex:1;max-width:200px">
+                  <input type="range" min="11" max="20" value="14" id="s-fs" oninput="sFS(this.value)"/>
+                  <span id="s-fsv" style="font-size:12px;color:var(--text2);min-width:34px">14px</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:12px">
+            <div class="ch"><i data-lucide="type"></i> <span data-i18n="font_style">Font Style</span></div>
+            <div class="cb" style="display:flex;flex-direction:column;gap:7px">
+              <button class="btn btn-g btn-sm" style="justify-content:flex-start" onclick="setFont('inter','Inter')">Inter (Default)</button>
+              <button class="btn btn-g btn-sm" style="justify-content:flex-start;font-family:'Space Grotesk'" onclick="setFont('space','Space Grotesk')">Space Grotesk</button>
+              <button class="btn btn-g btn-sm" style="justify-content:flex-start;font-family:'Fira Code'" onclick="setFont('mono','Fira Code')">Fira Code (Mono)</button>
+              <button class="btn btn-g btn-sm" style="justify-content:flex-start;font-family:'Playfair Display'" onclick="setFont('playfair','Playfair Display')">Playfair Display</button>
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:12px">
+            <div class="ch"><i data-lucide="volume-2"></i> <span data-i18n="sound">Sound</span></div>
+            <div class="cb">
+              <div class="srow">
+                <div><div class="srow-l" data-i18n="click_sound">Click Sound</div><div class="srow-d" data-i18n="click_sound_desc">Play sound on button press</div></div>
+                <div class="toggle on" id="sound-toggle" onclick="toggleSound(this)"></div>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:12px">
+            <div class="ch"><i data-lucide="globe"></i> <span data-i18n="language">Language</span></div>
+            <div class="cb" style="display:flex;gap:7px;flex-wrap:wrap">
+              <button class="btn btn-g btn-sm" onclick="setLang('en')">🇬🇧 English</button>
+              <button class="btn btn-g btn-sm" onclick="setLang('th')">🇹🇭 ภาษาไทย</button>
+              <button class="btn btn-g btn-sm" onclick="setLang('ja')">🇯🇵 日本語</button>
+              <button class="btn btn-g btn-sm" onclick="setLang('zh')">🇨🇳 中文</button>
+              <button class="btn btn-g btn-sm" onclick="setLang('ko')">🇰🇷 한국어</button>
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:12px">
+            <div class="ch"><i data-lucide="image"></i> <span data-i18n="background">Background</span></div>
+            <div class="cb">
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+                <button class="btn btn-g btn-sm" onclick="setBg('none')" data-i18n="default">Default</button>
+                <button class="btn btn-g btn-sm" onclick="setBg('gradient1')">Gradient 1</button>
+                <button class="btn btn-g btn-sm" onclick="setBg('gradient2')">Gradient 2</button>
+                <button class="btn btn-g btn-sm" onclick="setBg('dots')">Dots</button>
+                <button class="btn btn-g btn-sm" onclick="setBg('grid')">Grid</button>
+              </div>
+              <button class="btn btn-g btn-sm" onclick="document.getElementById('bg-img-inp').click()"><i data-lucide="upload"></i> Upload Custom BG</button>
+              <input type="file" id="bg-img-inp" style="display:none" accept="image/*" onchange="uploadBG(this)"/>
+              <div style="margin-top:10px;font-size:12px;color:var(--text2)" data-i18n="drag_image_tip">💡 Drag any image onto any tab to place it anywhere!</div>
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:12px">
+            <div class="ch"><i data-lucide="toggle-left"></i> <span data-i18n="features">Features</span></div>
+            <div class="cb" id="feat-toggles"></div>
+          </div>
+          <div class="card">
+            <div class="ch"><i data-lucide="animation"></i> <span data-i18n="animations">Animations</span></div>
+            <div class="cb">
+              <div class="srow">
+                <div><div class="srow-l" data-i18n="animations">Enable Animations</div></div>
+                <div class="toggle on" id="anim-toggle" onclick="toggleAnim(this)"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /shell -->
+
+<script>
+/* ═══════════════════════════════════════════
+   TRANSLATIONS
+═══════════════════════════════════════════ */
+const LANGS = {
+  en: {
+    study_hub:'Study Hub', study_sub:'Your AI-powered command center',
+    ai_tab:'AI', notes:'Notes', homework:'Homework', converter:'Converter Hub',
+    file_convert:'File Converter', rewards:'Rewards', game:'Game', story:'Story',
+    guide:'Guide', credits:'Credits', account:'Account', settings:'Settings', shop:'Shop',
+    quick_actions:'Quick Actions', daily_streak:'Daily Login Streak',
+    todays_progress:"Today's XP Progress", daily_goal:'Daily Goal',
+    total_xp:'Total XP', tasks_done:'Tasks Done', coins:'Coins',
+    new_chat:'New Chat', chat:'Chat', quick_prompts:'Quick Prompts',
+    new_note:'New Note', save:'Save', export:'Export',
+    add_task:'Add Task', task:'Task', subject:'Subject', due:'Due', priority:'Priority',
+    all:'All', pending:'Pending', done:'Done', calendar:'Calendar',
+    calculator:'Calculator', unit_converter:'Unit Converter', text_tools:'Text Tools',
+    category:'Category', from:'From', to:'To',
+    image_converter:'Image Converter', data_converter:'Data Converter',
+    ai_file_analysis:'AI File Analysis', drop_image:'Drop image or click',
+    drop_file:'Drop file for AI analysis', convert_to:'Convert To', resize:'Resize',
+    convert:'Convert', file_convert_sub:'Convert files in your browser',
+    level_xp:'Level & XP', daily_quests:'Daily Quests', achievements:'Achievements',
+    open_shop:'Open Shop', guide_sub:'How to use Venora — explained simply',
+    profile:'Profile', account_stats:'Account Stats', member_since:'Member Since',
+    login_streak:'Login Streak', switch_account:'Switch Account',
+    switch_desc:'Log out and switch accounts. Your data stays saved.',
+    logout:'Logout', save_profile:'Save Profile', nickname:'Nickname',
+    username:'Username', password:'Password', login:'Login', register:'Register',
+    display:'Display', dark_mode:'Dark / Light Mode', blur:'Blur',
+    radius:'Border Radius', font_size:'Font Size', font_style:'Font Style',
+    sound:'Sound', click_sound:'Click Sound', click_sound_desc:'Sound on button press',
+    language:'Language', background:'Background', features:'Features',
+    animations:'Animations', default:'Default', drag_image_tip:'💡 Drag images onto any tab!',
+    tool:'Tool', new_story:'New Story',
+  },
+  th: {
+    study_hub:'ศูนย์การเรียน', study_sub:'ระบบเรียนรู้ด้วย AI',
+    ai_tab:'AI', notes:'โน้ต', homework:'การบ้าน', converter:'ตัวแปลงค่า',
+    file_convert:'แปลงไฟล์', rewards:'รางวัล', game:'เกม', story:'เรื่องราว',
+    guide:'คู่มือ', credits:'เครดิต', account:'บัญชี', settings:'ตั้งค่า', shop:'ร้านค้า',
+    quick_actions:'การกระทำด่วน', daily_streak:'เข้าสู่ระบบต่อเนื่อง',
+    todays_progress:'ความคืบหน้าวันนี้', daily_goal:'เป้าหมายรายวัน',
+    total_xp:'XP ทั้งหมด', tasks_done:'งานเสร็จ', coins:'เหรียญ',
+    new_chat:'แชทใหม่', chat:'แชท', quick_prompts:'คำถามด่วน',
+    new_note:'โน้ตใหม่', save:'บันทึก', export:'ส่งออก',
+    add_task:'เพิ่มงาน', task:'งาน', subject:'วิชา', due:'กำหนดส่ง', priority:'ความสำคัญ',
+    all:'ทั้งหมด', pending:'รอดำเนินการ', done:'เสร็จแล้ว', calendar:'ปฏิทิน',
+    calculator:'เครื่องคิดเลข', unit_converter:'แปลงหน่วย', text_tools:'เครื่องมือข้อความ',
+    category:'หมวดหมู่', from:'จาก', to:'ไปยัง',
+    image_converter:'แปลงรูปภาพ', data_converter:'แปลงข้อมูล',
+    ai_file_analysis:'วิเคราะห์ไฟล์ด้วย AI', drop_image:'วางรูปหรือคลิก',
+    drop_file:'วางไฟล์เพื่อวิเคราะห์', convert_to:'แปลงเป็น', resize:'ปรับขนาด',
+    convert:'แปลง', file_convert_sub:'แปลงไฟล์ในเบราว์เซอร์',
+    level_xp:'เลเวลและ XP', daily_quests:'ภารกิจรายวัน', achievements:'ความสำเร็จ',
+    open_shop:'เปิดร้านค้า', guide_sub:'วิธีใช้ Venora — อธิบายง่ายๆ',
+    profile:'โปรไฟล์', account_stats:'สถิติบัญชี', member_since:'สมาชิกตั้งแต่',
+    login_streak:'เข้าสู่ระบบต่อเนื่อง', switch_account:'เปลี่ยนบัญชี',
+    switch_desc:'ออกจากระบบและเปลี่ยนบัญชี ข้อมูลคุณยังอยู่',
+    logout:'ออกจากระบบ', save_profile:'บันทึกโปรไฟล์', nickname:'ชื่อเล่น',
+    username:'ชื่อผู้ใช้', password:'รหัสผ่าน', login:'เข้าสู่ระบบ', register:'ลงทะเบียน',
+    display:'การแสดงผล', dark_mode:'โหมดมืด/สว่าง', blur:'ความเบลอ',
+    radius:'มุมโค้ง', font_size:'ขนาดตัวอักษร', font_style:'รูปแบบตัวอักษร',
+    sound:'เสียง', click_sound:'เสียงคลิก', click_sound_desc:'เล่นเสียงเมื่อกดปุ่ม',
+    language:'ภาษา', background:'พื้นหลัง', features:'คุณสมบัติ',
+    animations:'แอนิเมชัน', default:'ค่าเริ่มต้น', drag_image_tip:'💡 ลากรูปภาพใส่แต่ละแท็บได้!',
+    tool:'เครื่องมือ', new_story:'เรื่องราวใหม่',
+  },
+  ja: {
+    study_hub:'学習ハブ', study_sub:'AIパワード学習センター',
+    ai_tab:'AI', notes:'ノート', homework:'宿題', converter:'変換ハブ',
+    file_convert:'ファイル変換', rewards:'報酬', game:'ゲーム', story:'ストーリー',
+    guide:'ガイド', credits:'クレジット', account:'アカウント', settings:'設定', shop:'ショップ',
+    quick_actions:'クイックアクション', daily_streak:'ログインストリーク',
+    todays_progress:'今日の進捗', daily_goal:'デイリーゴール',
+    total_xp:'合計XP', tasks_done:'完了タスク', coins:'コイン',
+    new_chat:'新チャット', chat:'チャット', quick_prompts:'クイックプロンプト',
+    new_note:'新しいノート', save:'保存', export:'エクスポート',
+    add_task:'タスク追加', task:'タスク', subject:'科目', due:'期日', priority:'優先度',
+    all:'全て', pending:'保留中', done:'完了', calendar:'カレンダー',
+    calculator:'計算機', unit_converter:'単位変換', text_tools:'テキストツール',
+    category:'カテゴリ', from:'から', to:'へ',
+    image_converter:'画像変換', data_converter:'データ変換',
+    ai_file_analysis:'AIファイル分析', drop_image:'画像をドロップまたはクリック',
+    drop_file:'AIで分析するファイルをドロップ', convert_to:'変換先', resize:'リサイズ',
+    convert:'変換', file_convert_sub:'ブラウザでファイルを変換',
+    level_xp:'レベルとXP', daily_quests:'デイリークエスト', achievements:'実績',
+    open_shop:'ショップを開く', guide_sub:'Venoraの使い方 — 簡単に説明',
+    profile:'プロフィール', account_stats:'アカウント統計', member_since:'メンバー登録日',
+    login_streak:'ログインストリーク', switch_account:'アカウント切替',
+    switch_desc:'ログアウトして別のアカウントに切り替える。データは保存されます。',
+    logout:'ログアウト', save_profile:'プロフィール保存', nickname:'ニックネーム',
+    username:'ユーザー名', password:'パスワード', login:'ログイン', register:'登録',
+    display:'表示', dark_mode:'ダーク/ライトモード', blur:'ブラー',
+    radius:'角丸', font_size:'フォントサイズ', font_style:'フォントスタイル',
+    sound:'サウンド', click_sound:'クリック音', click_sound_desc:'ボタン押下時に音',
+    language:'言語', background:'背景', features:'機能',
+    animations:'アニメーション', default:'デフォルト', drag_image_tip:'💡 画像をタブにドラッグできます!',
+    tool:'ツール', new_story:'新しいストーリー',
+  },
+  zh: {
+    study_hub:'学习中心', study_sub:'AI驱动的学习平台',
+    ai_tab:'AI', notes:'笔记', homework:'作业', converter:'换算中心',
+    file_convert:'文件转换', rewards:'奖励', game:'游戏', story:'故事',
+    guide:'指南', credits:'制作人员', account:'账户', settings:'设置', shop:'商店',
+    quick_actions:'快捷操作', coins:'金币', total_xp:'总XP', tasks_done:'已完成任务',
+    new_chat:'新对话', save:'保存', add_task:'添加任务', calendar:'日历',
+    calculator:'计算器', unit_converter:'单位换算', achievements:'成就',
+    daily_quests:'每日任务', login:'登录', register:'注册',
+    language:'语言', settings:'设置', logout:'退出', new_story:'新故事',
+    dark_mode:'深色/浅色模式', blur:'模糊', font_size:'字体大小',
+  },
+  ko: {
+    study_hub:'학습 허브', study_sub:'AI 기반 학습 시스템',
+    ai_tab:'AI', notes:'노트', homework:'숙제', converter:'변환 허브',
+    file_convert:'파일 변환', rewards:'보상', game:'게임', story:'스토리',
+    guide:'가이드', credits:'크레딧', account:'계정', settings:'설정', shop:'상점',
+    quick_actions:'빠른 실행', coins:'코인', total_xp:'총 XP', tasks_done:'완료 작업',
+    new_chat:'새 채팅', save:'저장', add_task:'작업 추가', calendar:'달력',
+    calculator:'계산기', unit_converter:'단위 변환', achievements:'업적',
+    daily_quests:'일일 퀘스트', login:'로그인', register:'등록',
+    language:'언어', logout:'로그아웃', new_story:'새 스토리',
+    dark_mode:'다크/라이트 모드', blur:'블러', font_size:'글꼴 크기',
+  }
+};
+
+/* ═══════════════════════════════════════════
+   TABS CONFIG
+═══════════════════════════════════════════ */
+const TABS_CFG = [
+  { id:'study',        lbl:'study_hub',     icon:'book-open' },
+  { id:'ai',           lbl:'ai_tab',        icon:'message-circle' },
+  { id:'notes',        lbl:'notes',         icon:'file-text' },
+  { id:'homework',     lbl:'homework',      icon:'check-square' },
+  { id:'converter',    lbl:'converter',     icon:'calculator' },
+  { id:'fileconv',     lbl:'file_convert',  icon:'file-down' },
+  { id:'gamification', lbl:'rewards',       icon:'trophy' },
+  { id:'shop',         lbl:'shop',          icon:'shopping-bag' },
+  { id:'game',         lbl:'game',          icon:'gamepad-2' },
+  { id:'guide',        lbl:'guide',         icon:'help-circle' },
+  { id:'credits',      lbl:'credits',       icon:'heart' },
+];
+
+const LEVELS = [
+  {level:1,title:'Rookie Scholar',xp:200},{level:2,title:'Curious Mind',xp:500},
+  {level:3,title:'Knowledge Seeker',xp:1000},{level:4,title:'Study Champion',xp:1800},
+  {level:5,title:'Academic Elite',xp:3000},{level:6,title:'Grand Scholar',xp:5000},
+  {level:7,title:'Wisdom Master',xp:8000},{level:8,title:'Legendary Learner',xp:12000},
+  {level:9,title:'Cosmic Scholar',xp:18000},{level:10,title:'Venora Master',xp:Infinity},
+];
+
+const ACH_DEF = [
+  {id:'first_note',    icon:'📝', name:'First Note',      desc:'Save your first note',        xp:20,  coins:5},
+  {id:'fast_learner',  icon:'⚡', name:'Fast Learner',    desc:'Ask AI 5 questions',          xp:30,  coins:8},
+  {id:'note_master',   icon:'📚', name:'Note Master',     desc:'Save 10 notes',               xp:50,  coins:15},
+  {id:'file_wizard',   icon:'🧙', name:'File Wizard',     desc:'Analyze a file with AI',      xp:40,  coins:10},
+  {id:'task_hero',     icon:'✅', name:'Task Hero',       desc:'Complete 5 tasks',            xp:45,  coins:12},
+  {id:'xp_100',        icon:'💯', name:'Century',         desc:'Earn 100 total XP',           xp:25,  coins:5},
+  {id:'xp_1000',       icon:'🏅', name:'XP Hunter',       desc:'Earn 1000 total XP',          xp:100, coins:50},
+  {id:'converter_pro', icon:'🔄', name:'Converter Pro',   desc:'Convert a file',              xp:20,  coins:5},
+  {id:'zombie_kill',   icon:'🧟', name:'Zombie Slayer',   desc:'Kill 50 zombies',             xp:60,  coins:20},
+  {id:'wave10',        icon:'🌊', name:'Wave Rider',      desc:'Survive 10 waves',            xp:80,  coins:30},
+  {id:'wave50',        icon:'🏆', name:'Wave Master',     desc:'Complete all 50 waves',       xp:300, coins:200},
+  {id:'streak7',       icon:'🔥', name:'Week Warrior',    desc:'7-day login streak',          xp:70,  coins:25},
+  {id:'streak30',      icon:'🌟', name:'Monthly Legend',  desc:'30-day login streak',         xp:300, coins:100},
+  {id:'first_login',   icon:'👋', name:'Welcome!',        desc:'Log in for the first time',   xp:10,  coins:10},
+  {id:'shopper',       icon:'🛍️', name:'Shopaholic',      desc:'Buy something from the shop', xp:15,  coins:0},
+  {id:'story_end',     icon:'📖', name:'Story Teller',    desc:'Complete a story',            xp:30,  coins:10},
+  {id:'coin_100',      icon:'💰', name:'Coin Collector',  desc:'Collect 100 coins',           xp:40,  coins:0},
+  {id:'coin_500',      icon:'💎', name:'Coin Hoarder',    desc:'Collect 500 coins',           xp:100, coins:0},
+];
+
+const QUEST_DEF = [
+  {id:'q1',icon:'🧠',name:'Brain Exercise',  desc:'Ask AI 3 questions',   xp:30,  coins:5,  goal:3, key:'ai_q'},
+  {id:'q2',icon:'📝',name:'Note Taker',      desc:'Save a note today',    xp:20,  coins:3,  goal:1, key:'note_s'},
+  {id:'q3',icon:'✅',name:'Task Crusher',    desc:'Complete 2 tasks',     xp:35,  coins:5,  goal:2, key:'task_d'},
+  {id:'q4',icon:'🎮',name:'Gamer',           desc:'Kill 10 zombies',      xp:25,  coins:10, goal:10,key:'zombie_kills'},
+  {id:'q5',icon:'💱',name:'Converter',       desc:'Use converter once',   xp:15,  coins:3,  goal:1, key:'conv_used'},
+];
+
+const SHOP_ITEMS = [
+  {id:'xp_boost',    icon:'⚡', name:'XP Boost',       desc:'+100 instant XP',           price:50,  effect:'xp100'},
+  {id:'xp_boost2',   icon:'🚀', name:'XP Mega Boost',  desc:'+500 instant XP',           price:200, effect:'xp500'},
+  {id:'coin_lucky',  icon:'🎲', name:'Lucky Roll',      desc:'Win 10-100 random coins',   price:30,  effect:'lucky'},
+  {id:'custom_bg1',  icon:'🎨', name:'Gradient Theme',  desc:'Unlock gradient background',price:40,  effect:'bg_gradient'},
+  {id:'title_elite', icon:'👑', name:'Elite Title',     desc:'Unlock "Elite" title',      price:100, effect:'title_elite'},
+  {id:'coin_daily',  icon:'📅', name:'Daily Coin+',     desc:'+5 bonus coins daily for 7 days',price:80,effect:'daily_bonus'},
+];
+
+const CONV_DATA = {
+  length:{units:['mm','cm','m','km','in','ft','yd','mi','nmi'],factors:{mm:.001,cm:.01,m:1,km:1000,in:.0254,ft:.3048,yd:.9144,mi:1609.344,nmi:1852}},
+  weight:{units:['mg','g','kg','t','oz','lb','stone'],factors:{mg:.001,g:1,kg:1000,t:1e6,oz:28.3495,lb:453.592,stone:6350.29}},
+  temp:{units:['°C','°F','K'],special:true},
+  speed:{units:['m/s','km/h','mph','knot','ft/s'],factors:{'m/s':1,'km/h':1/3.6,'mph':.44704,'knot':.514444,'ft/s':.3048}},
+  area:{units:['mm²','cm²','m²','km²','in²','ft²','acre','ha'],factors:{'mm²':1e-6,'cm²':1e-4,'m²':1,'km²':1e6,'in²':6.452e-4,'ft²':.0929,'acre':4046.86,'ha':10000}},
+  data:{units:['bit','B','KB','MB','GB','TB','PB'],factors:{bit:1,B:8,KB:8192,MB:8388608,GB:8589934592,TB:8796093022208,PB:8.796e15}},
+  fuel:{units:['mpg','km/L','L/100km'],special:'fuel'},
+  time:{units:['ms','s','min','hr','day','week','month','year'],factors:{ms:.001,s:1,min:60,hr:3600,day:86400,week:604800,month:2629800,year:31557600}},
+  energy:{units:['J','kJ','cal','kcal','Wh','kWh','BTU'],factors:{J:1,kJ:1000,cal:4.184,kcal:4184,'Wh':3600,'kWh':3600000,BTU:1055.06}},
+  pressure:{units:['Pa','kPa','MPa','bar','atm','psi','mmHg'],factors:{Pa:1,kPa:1000,MPa:1e6,bar:100000,atm:101325,psi:6894.76,mmHg:133.322}},
+};
+
+const QUICK_PROMPTS = [
+  'Explain the Pythagorean theorem','What is photosynthesis?','How does gravity work?',
+  'Explain the French Revolution','What is a derivative in calculus?',
+  'How does DNA replicate?','Explain machine learning simply','What is quantum mechanics?',
+  'Solve: 2x + 5 = 15','What caused WW2?',
+];
+
+const STORY_NODES = {
+  start:{text:"You wake up in a mysterious forest. Ancient trees tower above you, and you can hear distant sounds. A glowing path leads north, while a dark cave sits to the east.",choices:[{text:"Follow the glowing path",next:'path'},{text:"Explore the dark cave",next:'cave'},{text:"Climb a tree to look around",next:'tree'}]},
+  path:{text:"The glowing path leads you to a clearing where a wise old wizard sits by a fire. 'Ah, a traveler!' he says. 'I can teach you magic, or show you the way to the hidden treasure.'",choices:[{text:"Learn magic from the wizard",next:'magic'},{text:"Ask about the treasure",next:'treasure'},{text:"Ignore him and continue",next:'continue_path'}]},
+  cave:{text:"Inside the cave, you find glowing crystals and a sleeping dragon. The dragon stirs and opens one enormous eye, looking at you curiously.",choices:[{text:"Back away slowly",next:'escape'},{text:"Try to befriend the dragon",next:'dragon_friend'},{text:"Search for treasure while it sleeps",next:'dragon_steal'}]},
+  tree:{text:"From up high, you can see everything — a castle to the west, a village to the south, and a storm approaching from the north.",choices:[{text:"Head to the castle",next:'castle'},{text:"Visit the village",next:'village'}]},
+  magic:{text:"The wizard teaches you a powerful spell. You learn to create light from darkness. You've gained a magical ability that will serve you well on your journey. THE END — You became a mage! 🧙‍♂️",choices:[],end:true,reward:{xp:30,coins:10}},
+  treasure:{text:"Following the wizard's map, you discover a chest of gold! You share it with nearby villagers and become a beloved hero. THE END — You became a hero! ⚔️",choices:[],end:true,reward:{xp:30,coins:15}},
+  continue_path:{text:"You continue alone and find a magical sword that lets you understand all languages. Your journey has just begun... THE END — Adventure awaits! 🗡️",choices:[],end:true,reward:{xp:20,coins:8}},
+  escape:{text:"You back out carefully. The dragon just wanted company! You made an unexpected friend. THE END — Dragon friend! 🐉",choices:[],end:true,reward:{xp:25,coins:10}},
+  dragon_friend:{text:"The dragon loves you! It flies you over the entire kingdom. You see wonders no one else has ever seen. THE END — Dragon rider! 🐲",choices:[],end:true,reward:{xp:40,coins:20}},
+  dragon_steal:{text:"You grab the treasure but the dragon wakes up! It chases you, but you escape using your wits. THE END — Lucky escape! 💨",choices:[],end:true,reward:{xp:15,coins:5}},
+  castle:{text:"The castle belongs to a kind queen who needs a brave helper. You accept the quest to save the kingdom. THE END — Royal champion! 👑",choices:[],end:true,reward:{xp:35,coins:12}},
+  village:{text:"In the village, you meet incredible people and decide to stay, building a new life. THE END — Found home! 🏠",choices:[],end:true,reward:{xp:20,coins:8}},
+};
+
+/* ═══════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════ */
+let currentUser = null;
+let S = {};
+let soundEnabled = true;
+let currentLang = 'en';
+let currentTab = 'study';
+let sidebarCollapsed = false;
+let aiMode = 'tutor';
+let currentChatSession = 0;
+let calcState = {expr:'',result:'0',hasResult:false};
+let cvCat = 'length';
+let gameState = null;
+let gameRunning = false;
+let gameAnimFrame = null;
+let ddValues = {subj:'Math', pri:'Medium'};
+let draggableImages = [];
+let imgSrc = null;
+
+const DEFAULTS_STATE = () => ({
+  notes:[], noteIdx:-1,
+  tasks:[], taskFilter:'all',
+  chatSessions:[{id:Date.now(),name:'Chat 1',messages:[],mode:'tutor'}],
+  currentChatIdx:0,
+  XP:0, dayXP:0, dayDate:'',
+  coins:0, totalCoinsEarned:0,
+  achs:[],
+  quests:{}, questsDate:'',
+  loginDates:[], loginStreak:0,
+  settings:{blur:20,radius:13,anim:true,fs:14,font:'inter',darkMode:true,sound:true,lang:'en',bg:'none',feats:{ai:true,files:true,anim:true,game:true}},
+  createdAt: new Date().toISOString(),
+  nickname:'',
+  avatarData:'',
+  usernameChangedAt:'',
+  purchasedItems:[],
+  shopBonus:{dailyCoins:0,dailyCoinsDays:0},
+  titles:[],
+  zombieKills:0,
+  bgImages:[],
+  storyCompleted:0,
+});
+
+function getAccountKey(username){ return 'venora_acc_'+username.toLowerCase(); }
+function getMetaKey(){ return 'venora_meta'; }
+
+function loadUser(username){
+  try {
+    const raw = localStorage.getItem(getAccountKey(username));
+    if(raw){
+      const saved = JSON.parse(raw);
+      const def = DEFAULTS_STATE();
+      S = deepMerge(def, saved);
+    } else {
+      S = DEFAULTS_STATE();
+      S.createdAt = new Date().toISOString();
+    }
+  } catch(e){ S = DEFAULTS_STATE(); }
+}
+
+function saveUser(){
+  if(!currentUser) return;
+  try { localStorage.setItem(getAccountKey(currentUser), JSON.stringify(S)); } catch(e){}
+}
+
+function deepMerge(defaults, saved){
+  const out = {...defaults};
+  for(const k of Object.keys(saved)){
+    if(saved[k] && typeof saved[k]==='object' && !Array.isArray(saved[k]) && defaults[k] && typeof defaults[k]==='object'){
+      out[k] = deepMerge(defaults[k], saved[k]);
+    } else { out[k] = saved[k]; }
+  }
+  return out;
+}
+
+function getMeta(){ try{ return JSON.parse(localStorage.getItem(getMetaKey())||'{}'); }catch(e){return {};} }
+function saveMeta(m){ localStorage.setItem(getMetaKey(), JSON.stringify(m)); }
+
+/* ═══════════════════════════════════════════
+   BOOT
+═══════════════════════════════════════════ */
+window.addEventListener('DOMContentLoaded', () => {
+  // Init lucide
+  function tryLucide(n){
+    if(window.lucide && typeof lucide.createIcons==='function'){ lucide.createIcons(); bootApp(); }
+    else if(n>0) setTimeout(()=>tryLucide(n-1),120);
+    else bootApp();
+  }
+  tryLucide(25);
+});
+
+function bootApp(){
+  // After loader animation
+  setTimeout(()=>{
+    const loader = document.getElementById('loader');
+    loader.classList.add('out');
+    setTimeout(()=>{ loader.style.display='none'; checkAuth(); }, 600);
+  }, 2600);
+}
+
+/* ═══════════════════════════════════════════
+   AUTH
+═══════════════════════════════════════════ */
+let authMode = 'login';
+
+function checkAuth(){
+  const meta = getMeta();
+  if(meta.lastUser){
+    // Auto-login
+    currentUser = meta.lastUser;
+    loadUser(currentUser);
+    applySettings();
+    initApp();
+  } else {
+    showAuth();
+  }
+}
+
+function showAuth(){
+  const as = document.getElementById('auth-screen');
+  as.style.display='flex';
+  as.style.animation='panIn 0.4s ease';
+  setTimeout(()=>{ try{ lucide.createIcons(); }catch(e){} },100);
+}
+
+function authTab(mode){
+  authMode = mode;
+  document.getElementById('auth-tab-login').classList.toggle('active', mode==='login');
+  document.getElementById('auth-tab-reg').classList.toggle('active', mode==='register');
+  document.getElementById('auth-nick-wrap').style.display = mode==='register'?'flex':'none';
+  document.getElementById('auth-btn').textContent = mode==='login'?t('login'):t('register');
+  document.getElementById('auth-err').style.display='none';
+  document.getElementById('auth-switch-text').innerHTML = mode==='login'
+    ? `Don't have an account? <span style="color:var(--text2);cursor:pointer;text-decoration:underline" onclick="authTab('register')">Register</span>`
+    : `Already have an account? <span style="color:var(--text2);cursor:pointer;text-decoration:underline" onclick="authTab('login')">Login</span>`;
+}
+
+function authSubmit(){
+  clickSound();
+  const user = document.getElementById('auth-user').value.trim().toLowerCase();
+  const pass = document.getElementById('auth-pass').value;
+  const nick = document.getElementById('auth-nick').value.trim();
+  const errEl = document.getElementById('auth-err');
+  errEl.style.display='none';
+
+  if(!user || !pass){ showAuthErr('Please fill all fields'); return; }
+  if(user.length<2){ showAuthErr('Username too short (min 2)'); return; }
+  if(!/^[a-z0-9_]+$/.test(user)){ showAuthErr('Username: only letters, numbers, underscore'); return; }
+  if(pass.length<4){ showAuthErr('Password too short (min 4)'); return; }
+
+  const meta = getMeta();
+  if(authMode==='register'){
+    if(meta.accounts && meta.accounts[user]){ showAuthErr('Username already taken!'); return; }
+    if(!nick){ showAuthErr('Please enter a nickname'); return; }
+    // Create account
+    if(!meta.accounts) meta.accounts={};
+    meta.accounts[user] = {hash: simpleHash(pass), createdAt: new Date().toISOString()};
+    meta.lastUser = user;
+    saveMeta(meta);
+    currentUser = user;
+    loadUser(currentUser);
+    S.nickname = nick;
+    checkAch('first_login', true);
+    saveUser();
+    hideAuth(); applySettings(); initApp();
+    notify('check','Account created! Welcome '+(nick||user)+'! 🎉');
+  } else {
+    if(!meta.accounts || !meta.accounts[user]){ showAuthErr('Account not found'); return; }
+    if(meta.accounts[user].hash !== simpleHash(pass)){ showAuthErr('Wrong password!'); return; }
+    meta.lastUser = user;
+    saveMeta(meta);
+    currentUser = user;
+    loadUser(currentUser);
+    hideAuth(); applySettings(); initApp();
+    notify('check','Welcome back, '+(S.nickname||user)+'! 👋');
+  }
+}
+
+function showAuthErr(msg){
+  const e = document.getElementById('auth-err');
+  e.textContent = msg; e.style.display='block';
+}
+
+function hideAuth(){
+  const as = document.getElementById('auth-screen');
+  as.style.opacity='0'; as.style.transition='opacity 0.4s';
+  setTimeout(()=>as.style.display='none', 400);
+}
+
+function logout(){
+  if(!confirm('Log out? Your progress is saved.')) return;
+  const meta = getMeta();
+  delete meta.lastUser;
+  saveMeta(meta);
+  currentUser = null; S = {};
+  document.getElementById('shell').classList.remove('visible');
+  showAuth(); authTab('login');
+}
+
+function simpleHash(str){
+  let h=0;
+  for(let i=0;i<str.length;i++){ h=(Math.imul(31,h)+str.charCodeAt(i))|0; }
+  return h.toString(36);
+}
+
+/* ═══════════════════════════════════════════
+   INIT APP
+═══════════════════════════════════════════ */
+function initApp(){
+  const shell = document.getElementById('shell');
+  shell.style.display='flex';
+  setTimeout(()=>shell.classList.add('visible'),50);
+
+  buildNav();
+  applySettings();
+  buildSettingsValues();
+  renderAll();
+  initChat();
+  setupDrops();
+  setupGlobalDrop();
+  updateConvUnits();
+  doConv();
+  buildQPrompts();
+  buildFeatToggles();
+  buildShop();
+  buildGuide();
+  buildSettingsPreview();
+  checkLoginStreak();
+  handleLoginReward();
+  try{ lucide.createIcons(); }catch(e){}
+
+  // Events
+  const ci = document.getElementById('chat-inp');
+  if(ci) ci.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();} });
+  document.getElementById('cmdpal-inp').addEventListener('input',e=>cmdFilter(e.target.value));
+  document.getElementById('cmdpal-inp').addEventListener('keydown',e=>{
+    if(e.key==='Escape') closeCmd();
+    if(e.key==='Enter'){ const s=document.querySelector('.cmd-i.sel'); if(s) s.click(); }
+  });
+  document.getElementById('cmdpal').addEventListener('click',e=>{ if(e.target.id==='cmdpal') closeCmd(); });
+  document.addEventListener('keydown',e=>{
+    if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();openCmd();}
+  });
+  // Close dropdowns on outside click
+  document.addEventListener('click',e=>{
+    if(!e.target.closest('.dd-wrap')) closeAllDD();
+  });
+  // Add ripple to buttons
+  document.addEventListener('click',e=>{
+    const btn = e.target.closest('.btn');
+    if(btn){ clickSound(); addRipple(btn,e); }
+  });
+}
+
+function renderAll(){
+  renderNotes(); renderTasks(); renderChatSessions();
+  renderQuests(); renderAchs(); buildCal(); updateStats(); updateXP();
+  updateSidebarUser(); updateAccountPage(); renderStreak();
+}
+
+/* ═══════════════════════════════════════════
+   TRANSLATION
+═══════════════════════════════════════════ */
+function t(key){
+  const lang = (S.settings && S.settings.lang) || currentLang || 'en';
+  return (LANGS[lang] && LANGS[lang][key]) || LANGS.en[key] || key;
+}
+
+function applyLang(){
+  currentLang = (S.settings && S.settings.lang) || 'en';
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key = el.dataset.i18n;
+    // Don't override inputs
+    if(el.tagName==='INPUT'||el.tagName==='TEXTAREA') return;
+    const translation = t(key);
+    if(translation) el.textContent = translation;
+  });
+  // Rebuild nav to translate
+  buildNav();
+  buildGuide();
+  renderQuests();
+  try{lucide.createIcons();}catch(e){}
+}
+
+function setLang(lang){
+  clickSound();
+  S.settings.lang = lang; currentLang = lang;
+  saveUser(); applyLang();
+  notify('check','Language changed!');
+}
+
+/* ═══════════════════════════════════════════
+   NAV / TABS
+═══════════════════════════════════════════ */
+function buildNav(){
+  const nav = document.getElementById('nav');
+  nav.innerHTML = TABS_CFG.map(tb=>`
+    <button class="nav-item${tb.id===currentTab?' active':''}" onclick="goTab('${tb.id}')" data-tab="${tb.id}">
+      <span class="ni-icon"><i data-lucide="${tb.icon}"></i></span>
+      <span class="ni-lbl">${t(tb.lbl)}</span>
+    </button>`).join('');
+  // Sidebar bottom items
+  const botItems = ['account','settings'];
+  botItems.forEach(id=>{
+    const el = document.querySelector(`#sidebar-bot [data-tab="${id}"]`);
+    if(el) el.classList.toggle('active', currentTab===id);
+  });
+  try{lucide.createIcons();}catch(e){}
+}
+
+function goTab(id){
+  clickSound();
+  currentTab = id;
+  // Animate out old panel
+  document.querySelectorAll('.panel').forEach(p=>{
+    if(p.classList.contains('active')){
+      p.style.animation='none';
+      p.classList.remove('active');
+    }
+  });
+  const p = document.querySelector(`[data-panel="${id}"]`);
+  if(p){ p.classList.add('active'); p.style.animation=''; }
+  // Update nav
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));
+  // Page title
+  const tab = TABS_CFG.find(tb=>tb.id===id);
+  document.getElementById('page-title').textContent = tab ? t(tab.lbl) : (id==='account'?t('account'):id==='settings'?t('settings'):'');
+  // Special init
+  if(id==='study') updateStats();
+  if(id==='game') initGameCanvas();
+  closeCmd();
+  saveUser();
+}
+
+function toggleSidebar(){
+  clickSound();
+  sidebarCollapsed = !sidebarCollapsed;
+  document.getElementById('sidebar').classList.toggle('col', sidebarCollapsed);
+}
+
+/* ═══════════════════════════════════════════
+   CMD PALETTE
+═══════════════════════════════════════════ */
+function openCmd(){ document.getElementById('cmdpal').classList.add('open'); document.getElementById('cmdpal-inp').value=''; document.getElementById('cmdpal-inp').focus(); cmdFilter(''); }
+function closeCmd(){ document.getElementById('cmdpal').classList.remove('open'); }
+function cmdFilter(q){
+  q=q.toLowerCase();
+  const items=[
+    ...TABS_CFG.map(tb=>({icon:tb.icon,lbl:t(tb.lbl),desc:'Open '+t(tb.lbl),fn:()=>goTab(tb.id)})),
+    {icon:'user',lbl:t('account'),desc:'',fn:()=>goTab('account')},
+    {icon:'settings',lbl:t('settings'),desc:'',fn:()=>goTab('settings')},
+    {icon:'globe',lbl:'English',desc:'',fn:()=>setLang('en')},
+    {icon:'globe',lbl:'ภาษาไทย',desc:'',fn:()=>setLang('th')},
+    {icon:'globe',lbl:'日本語',desc:'',fn:()=>setLang('ja')},
+    {icon:'log-out',lbl:'Logout',desc:'',fn:logout},
+  ].filter(x=>!q||x.lbl.toLowerCase().includes(q)||x.desc.toLowerCase().includes(q));
+  document.getElementById('cmd-results').innerHTML=items.slice(0,9).map((x,i)=>`
+    <div class="cmd-i${i===0?' sel':''}" onclick="(${x.fn.toString()})();closeCmd()">
+      <div class="cmd-ico"><i data-lucide="${x.icon}"></i></div>
+      <div><div style="font-size:13px">${x.lbl}</div>${x.desc?`<div style="font-size:11px;color:var(--text2)">${x.desc}</div>`:''}</div>
+    </div>`).join('');
+  try{lucide.createIcons();}catch(e){}
+}
+
+/* ═══════════════════════════════════════════
+   CUSTOM DROPDOWN
+═══════════════════════════════════════════ */
+function toggleDD(id){
+  clickSound();
+  const el=document.getElementById(id);
+  if(!el) return;
+  const isOpen=el.style.display!=='none';
+  closeAllDD();
+  if(!isOpen){ el.style.display='block'; const trigger=el.previousElementSibling; if(trigger) trigger.classList.add('open'); }
+}
+function closeAllDD(){
+  document.querySelectorAll('.dd-menu').forEach(m=>{ m.style.display='none'; const t=m.previousElementSibling; if(t) t.classList.remove('open'); });
+}
+function setDD(key,val,display){
+  ddValues[key]=val;
+  const v=document.getElementById(key+'-val'); if(v) v.textContent=display;
+  closeAllDD();
+}
+function setAIMode(mode,label){
+  aiMode=mode;
+  document.getElementById('ai-mode-label').textContent=label;
+  closeAllDD();
+}
+function setCvCat(cat,label){
+  cvCat=cat;
+  document.getElementById('cv-cat-val').textContent=label;
+  updateConvUnits(); doConv();
+  closeAllDD();
+}
+
+/* ═══════════════════════════════════════════
+   CLICK SOUND & RIPPLE
+═══════════════════════════════════════════ */
+function clickSound(){
+  if(!soundEnabled) return;
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.value=800; osc.type='sine';
+    gain.gain.setValueAtTime(0.08,ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.05);
+    osc.start(); osc.stop(ctx.currentTime+0.06);
+  }catch(e){}
+}
+
+function addRipple(btn,e){
+  if(!S.settings||!S.settings.anim) return;
+  const rect=btn.getBoundingClientRect();
+  const r=document.createElement('span');
+  const size=Math.max(rect.width,rect.height);
+  r.className='btn-ripple';
+  r.style.cssText=`width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px`;
+  btn.appendChild(r);
+  setTimeout(()=>r.remove(),500);
+}
+
+/* ═══════════════════════════════════════════
+   AI CHAT
+═══════════════════════════════════════════ */
+function initChat(){
+  const sess = S.chatSessions[S.currentChatIdx]||S.chatSessions[0];
+  const wrap = document.getElementById('chat-msgs');
+  if(!wrap) return;
+  wrap.innerHTML='';
+  if(!sess.messages.length){
+    appendMsg('ai',"Hello! I'm your Venora AI assistant. Ask me anything — math, science, history, coding, or any subject. I'll explain clearly! 🎓",false);
+  } else {
+    sess.messages.slice(-20).forEach(m=>appendMsg(m.r,m.c,false));
+  }
+  document.getElementById('chat-session-name').textContent=sess.name||'Chat';
+  renderChatSessions();
+}
+
+function renderChatSessions(){
+  const wrap = document.getElementById('chat-sessions');
+  if(!wrap) return;
+  wrap.innerHTML = S.chatSessions.map((s,i)=>`
+    <div class="chat-session${i===S.currentChatIdx?' active':''}" onclick="switchChatSession(${i})">
+      <i data-lucide="message-circle" style="width:13px;height:13px;color:var(--text2);flex-shrink:0"></i>
+      <span class="cs-name">${esc(s.name||'Chat')}</span>
+      ${S.chatSessions.length>1?`<button class="btn btn-g btn-sm btn-ico" onclick="event.stopPropagation();delChatSession(${i})" style="width:20px;height:20px"><i data-lucide="x" style="width:10px;height:10px"></i></button>`:''}
+    </div>`).join('');
+  try{lucide.createIcons();}catch(e){}
+}
+
+function newChatSession(){
+  clickSound();
+  const sess={id:Date.now(),name:'Chat '+(S.chatSessions.length+1),messages:[],mode:'tutor'};
+  S.chatSessions.push(sess);
+  S.currentChatIdx=S.chatSessions.length-1;
+  saveUser(); initChat();
+}
+
+function switchChatSession(i){
+  clickSound();
+  S.currentChatIdx=i;
+  saveUser(); initChat();
+}
+
+function delChatSession(i){
+  if(S.chatSessions.length<=1){notify('alert-circle','Cannot delete last chat');return;}
+  S.chatSessions.splice(i,1);
+  S.currentChatIdx=Math.min(S.currentChatIdx,S.chatSessions.length-1);
+  saveUser(); initChat();
+}
+
+function appendMsg(role,text,sv=true){
+  const wrap=document.getElementById('chat-msgs');
+  if(!wrap) return;
+  const d=document.createElement('div');
+  d.className='msg '+role;
+  const av = role==='user'?(S.avatarData?`<img src="${S.avatarData}"/>`:(S.nickname||currentUser||'U')[0].toUpperCase()):'AI';
+  d.innerHTML=`<div class="mav">${av}</div><div class="mbub">${fmtMsg(text)}<button class="msg-edit-btn" onclick="editMsg(this)"><i data-lucide="pencil"></i></button></div>`;
+  wrap.appendChild(d);
+  wrap.scrollTop=wrap.scrollHeight;
+  if(sv){
+    const sess=S.chatSessions[S.currentChatIdx];
+    if(sess){ sess.messages.push({r:role,c:text}); if(sess.messages.length>60) sess.messages=sess.messages.slice(-60); }
+    saveUser();
+  }
+  try{lucide.createIcons();}catch(e){}
+}
+
+function fmtMsg(t){ return String(t).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/`(.+?)`/g,'<code>$1</code>').replace(/\n/g,'<br>'); }
+
+function editMsg(btn){
+  const bubble=btn.closest('.mbub');
+  const current=bubble.innerText.replace('✏','').trim();
+  const newText=prompt('Edit message:',current);
+  if(newText!==null&&newText.trim()){
+    bubble.innerHTML=fmtMsg(newText.trim())+'<button class="msg-edit-btn" onclick="editMsg(this)"><i data-lucide="pencil"></i></button>';
+    try{lucide.createIcons();}catch(e){}
+  }
+}
+
+function clearChat(){
+  const sess=S.chatSessions[S.currentChatIdx];
+  if(!sess) return;
+  sess.messages=[];
+  saveUser();
+  document.getElementById('chat-msgs').innerHTML='';
+  appendMsg('ai','Chat cleared! Ask me anything. 🎓',false);
+}
+
+async function sendChat(){
+  const inp=document.getElementById('chat-inp');
+  const msg=inp.value.trim(); if(!msg) return;
+  inp.value=''; inp.style.height='';
+  appendMsg('user',msg);
+  S.quests['ai_q']=(S.quests['ai_q']||0)+1;
+  xp(5,false); checkAch('fast_learner',S.quests['ai_q']>=5); saveUser(); renderQuests();
+  const ty=document.createElement('div');
+  ty.className='msg ai'; ty.id='ty-ind';
+  ty.innerHTML='<div class="mav">AI</div><div class="mbub"><span class="tdot"></span><span class="tdot"></span><span class="tdot"></span></div>';
+  document.getElementById('chat-msgs').appendChild(ty);
+  document.getElementById('chat-msgs').scrollTop=99999;
+  document.getElementById('chat-send').disabled=true;
+  const modes={tutor:'You are an expert friendly tutor. Explain clearly with examples. Use **bold** for key terms.',exam:'Give concise accurate exam answers. Key points only.',simple:'Explain to a 10-year-old. Simple words, short sentences, fun examples.',steps:'Break every answer into clear numbered steps. Be thorough.'};
+  const sys=modes[aiMode]+' Be encouraging and helpful for students. Keep responses focused.';
+  const sess=S.chatSessions[S.currentChatIdx];
+  const msgs=(sess?sess.messages:[]).slice(-12).map(m=>({role:m.r==='ai'?'assistant':'user',content:m.c}));
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:sys,messages:msgs})});
+    const data=await res.json();
+    document.getElementById('ty-ind')?.remove();
+    appendMsg('ai',data.content?.[0]?.text||'No response received.');
+  }catch(e){
+    document.getElementById('ty-ind')?.remove();
+    appendMsg('ai','⚠️ Could not reach AI. Check your connection and try again.');
+  }
+  document.getElementById('chat-send').disabled=false;
+}
+
+function buildQPrompts(){
+  const el=document.getElementById('qprompts'); if(!el) return;
+  el.innerHTML=QUICK_PROMPTS.map(p=>`<button class="btn btn-g btn-sm" onclick="qAsk('${p.replace(/'/g,"\\'")}')">💬 ${p}</button>`).join('');
+}
+function qAsk(q){ document.getElementById('chat-inp').value=q; goTab('ai'); sendChat(); }
+
+/* ═══════════════════════════════════════════
+   NOTES (Rich Text)
+═══════════════════════════════════════════ */
+function fmt(cmd,val){ document.execCommand(cmd,false,val||null); document.getElementById('note-editor').focus(); }
+function insertNoteImg(){
+  const input=document.createElement('input'); input.type='file'; input.accept='image/*';
+  input.onchange=e=>{
+    const f=e.target.files[0]; if(!f) return;
+    const r=new FileReader(); r.onload=ev=>{ document.execCommand('insertHTML',false,`<img src="${ev.target.result}" style="max-width:100%;border-radius:8px;margin:4px 0"/>`); };
+    r.readAsDataURL(f);
+  };
+  input.click();
+}
+
+function newNote(){
+  const n={id:Date.now(),title:'Untitled Note',content:'',created:new Date().toISOString()};
+  S.notes.unshift(n); S.noteIdx=0;
+  renderNotes(); loadEditor(); xp(3); updateStats();
+}
+function renderNotes(){
+  const el=document.getElementById('notes-list'); if(!el) return;
+  if(!S.notes.length){el.innerHTML='<div style="color:var(--text3);font-size:13px;padding:10px">No notes yet. Create one!</div>';return;}
+  el.innerHTML=S.notes.map((n,i)=>`
+    <div class="note-item${i===S.noteIdx?' active':''}" onclick="selNote(${i})">
+      <div class="note-t">${esc(n.title||'Untitled')}</div>
+      <div class="note-p">${esc(stripHtml(n.content||'').slice(0,60))}${stripHtml(n.content||'').length>60?'…':''}</div>
+      <div class="note-date">${new Date(n.created).toLocaleDateString()}</div>
+    </div>`).join('');
+}
+function stripHtml(h){ const d=document.createElement('div'); d.innerHTML=h; return d.textContent||''; }
+function selNote(i){ S.noteIdx=i; renderNotes(); loadEditor(); }
+function loadEditor(){
+  const n=S.notes[S.noteIdx]; if(!n) return;
+  document.getElementById('note-title').value=n.title||'';
+  document.getElementById('note-editor').innerHTML=n.content||'';
+}
+function saveNote(){
+  if(S.noteIdx===-1||!S.notes[S.noteIdx]){ newNote(); return; }
+  S.notes[S.noteIdx].title=document.getElementById('note-title').value.trim()||'Untitled';
+  S.notes[S.noteIdx].content=document.getElementById('note-editor').innerHTML;
+  S.notes[S.noteIdx].updated=new Date().toISOString();
+  S.quests['note_s']=(S.quests['note_s']||0)+1;
+  renderNotes(); xp(5); saveUser(); updateStats();
+  checkAch('first_note',true); checkAch('note_master',S.notes.length>=10); renderQuests();
+  document.getElementById('note-saved-lbl').textContent='Saved '+new Date().toLocaleTimeString();
+  notify('save','Note saved!');
+}
+function delNote(){
+  if(S.noteIdx===-1||!S.notes.length) return;
+  S.notes.splice(S.noteIdx,1);
+  S.noteIdx=Math.min(S.noteIdx,S.notes.length-1);
+  if(S.notes.length===0) S.noteIdx=-1;
+  renderNotes();
+  if(S.noteIdx>=0) loadEditor(); else{ document.getElementById('note-title').value=''; document.getElementById('note-editor').innerHTML=''; }
+  saveUser(); updateStats();
+}
+function exportNote(){
+  const n=S.notes[S.noteIdx]; if(!n){notify('alert-circle','No note selected');return;}
+  const blob=new Blob([`${n.title}\n\n${stripHtml(n.content)}`],{type:'text/plain'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=(n.title||'note')+'.txt'; a.click();
+}
+async function aiNoteAI(){
+  const c=document.getElementById('note-editor').innerHTML; if(!stripHtml(c).trim()){notify('alert-circle','Note is empty');return;}
+  notify('loader','AI analyzing note…');
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:'Summarize in 4-5 key bullet points:\n\n'+stripHtml(c)}]})});
+    const data=await res.json();
+    const ed=document.getElementById('note-editor');
+    ed.innerHTML+=`<hr style="border:none;border-top:1px solid var(--border);margin:12px 0"/><p><strong>🤖 AI Summary</strong></p><p>${(data.content?.[0]?.text||'').replace(/\n/g,'<br>')}</p>`;
+    notify('check','AI summary added!'); xp(10);
+  }catch(e){notify('x','AI failed.');}
+}
+
+/* ═══════════════════════════════════════════
+   TASKS
+═══════════════════════════════════════════ */
+function addTask(){
+  const name=document.getElementById('t-name').value.trim(); if(!name){notify('alert-circle','Enter task name!');return;}
+  S.tasks.unshift({id:Date.now(),name,subject:ddValues.subj,due:document.getElementById('t-due').value,priority:ddValues.pri,done:false,created:new Date().toISOString()});
+  document.getElementById('t-name').value='';
+  renderTasks(); xp(5); saveUser(); updateStats(); notify('check','Task added!');
+}
+function toggleTask(id){
+  const t=S.tasks.find(x=>x.id===id); if(!t) return;
+  t.done=!t.done;
+  if(t.done){ xp(15); coins(5); S.quests['task_d']=(S.quests['task_d']||0)+1; checkAch('task_hero',S.tasks.filter(x=>x.done).length>=5); notify('star','+15 XP +5 ◈!'); renderQuests(); }
+  renderTasks(); saveUser(); updateStats();
+}
+function delTask(id){ S.tasks=S.tasks.filter(x=>x.id!==id); renderTasks(); saveUser(); updateStats(); }
+function filterT(f){ S.taskFilter=f; renderTasks(); }
+function renderTasks(){
+  const el=document.getElementById('task-list'); if(!el) return;
+  let tasks=[...S.tasks];
+  if(S.taskFilter==='pending') tasks=tasks.filter(t=>!t.done);
+  if(S.taskFilter==='done') tasks=tasks.filter(t=>t.done);
+  if(!tasks.length){el.innerHTML='<div style="color:var(--text3);font-size:13px;padding:10px">No tasks here.</div>';return;}
+  el.innerHTML=tasks.map(t=>`
+    <div class="task-item${t.done?' done':''}">
+      <div class="tck${t.done?' on':''}" onclick="toggleTask(${t.id})">${t.done?'<i data-lucide="check" style="width:10px;height:10px"></i>':''}</div>
+      <div style="flex:1">
+        <div class="task-n">${esc(t.name)}</div>
+        <div class="task-m">${esc(t.subject||'')}${t.due?' · '+t.due:''} · ${t.priority||'Medium'}</div>
+      </div>
+      <button class="btn btn-g btn-sm btn-ico" onclick="delTask(${t.id})"><i data-lucide="x"></i></button>
+    </div>`).join('');
+  try{lucide.createIcons();}catch(e){}
+}
+
+/* ═══════════════════════════════════════════
+   CALCULATOR
+═══════════════════════════════════════════ */
+function calcPress(key){
+  clickSound();
+  const expr=document.getElementById('calc-expr');
+  const res=document.getElementById('calc-result');
+  if(key==='AC'){ calcState={expr:'',result:'0',hasResult:false}; expr.textContent=''; res.textContent='0'; return; }
+  if(key==='='||key==='Enter'){
+    try{
+      let e=calcState.expr.replace(/÷/g,'/').replace(/×/g,'*');
+      const r=Function('"use strict";return ('+e+')')();
+      const rStr=parseFloat(r.toFixed(10))+'';
+      expr.textContent=calcState.expr+' =';
+      res.textContent=rStr;
+      calcState.result=rStr; calcState.expr=rStr; calcState.hasResult=true;
+      S.quests['conv_used']=(S.quests['conv_used']||0)+1; renderQuests();
+    }catch(e){ res.textContent='Error'; calcState={expr:'',result:'0',hasResult:false}; }
+    return;
+  }
+  if(key==='+/-'){ if(calcState.result&&calcState.result!=='0'){ const n=-parseFloat(calcState.result)+''; calcState.expr=n; res.textContent=n; calcState.result=n; } return; }
+  if(key==='%'){ if(calcState.result){ const n=parseFloat(calcState.result)/100+''; calcState.expr=n; res.textContent=n; calcState.result=n; } return; }
+  if(calcState.hasResult&&['+','-','*','/'].includes(key)){ calcState.hasResult=false; }
+  else if(calcState.hasResult){ calcState.expr=''; calcState.hasResult=false; }
+  calcState.expr+=key;
+  res.textContent=calcState.expr.slice(-20);
+  expr.textContent='';
+}
+document.addEventListener('keydown',e=>{
+  if(currentTab!=='converter') return;
+  if('0123456789'.includes(e.key)) calcPress(e.key);
+  if(['+','-','*','/'].includes(e.key)) calcPress(e.key);
+  if(e.key==='Enter'||e.key==='=') calcPress('=');
+  if(e.key==='Backspace'){ calcState.expr=calcState.expr.slice(0,-1); document.getElementById('calc-result').textContent=calcState.expr||'0'; }
+  if(e.key==='Escape') calcPress('AC');
+  if(e.key==='.') calcPress('.');
+});
+
+/* ═══════════════════════════════════════════
+   UNIT CONVERTER
+═══════════════════════════════════════════ */
+function updateConvUnits(){
+  const d=CONV_DATA[cvCat]; if(!d) return;
+  ['cv-from','cv-to'].forEach((id,idx)=>{
+    const el=document.getElementById(id); if(!el) return;
+    el.innerHTML=d.units.map((u,i)=>`<option value="${u}"${i===idx?' selected':''}>${u}</option>`).join('');
+  });
+  doConv();
+}
+function doConv(){
+  const d=CONV_DATA[cvCat]; if(!d) return;
+  const val=parseFloat(document.getElementById('cv-val')?.value)||0;
+  const from=document.getElementById('cv-from')?.value;
+  const to=document.getElementById('cv-to')?.value;
+  let result=0;
+  if(d.special==='fuel'){
+    if(from==='mpg'&&to==='km/L') result=val*0.425144;
+    else if(from==='mpg'&&to==='L/100km') result=235.215/val;
+    else if(from==='km/L'&&to==='mpg') result=val*2.35215;
+    else if(from==='km/L'&&to==='L/100km') result=100/val;
+    else if(from==='L/100km'&&to==='mpg') result=235.215/val;
+    else if(from==='L/100km'&&to==='km/L') result=100/val;
+    else result=val;
+  } else if(cvCat==='temp'){
+    let c=from==='°F'?(val-32)*5/9:from==='K'?val-273.15:val;
+    result=to==='°F'?c*9/5+32:to==='K'?c+273.15:c;
+  } else {
+    result=(val*(d.factors[from]||1))/(d.factors[to]||1);
+  }
+  const rv=document.getElementById('cv-res'); if(rv) rv.textContent=+parseFloat(result.toFixed(10))+'';
+  const ru=document.getElementById('cv-unit'); if(ru) ru.textContent=to;
+  S.quests['conv_used']=(S.quests['conv_used']||0)+1; renderQuests();
+}
+function doTT(){
+  const tool=document.getElementById('tt-tool').value, inp=document.getElementById('tt-in').value;
+  let out='';
+  try{
+    if(tool==='b64e') out=btoa(unescape(encodeURIComponent(inp)));
+    else if(tool==='b64d') out=decodeURIComponent(escape(atob(inp)));
+    else if(tool==='json') out=JSON.stringify(JSON.parse(inp),null,2);
+    else if(tool==='upper') out=inp.toUpperCase();
+    else if(tool==='lower') out=inp.toLowerCase();
+    else if(tool==='wc') out=`Words: ${inp.split(/\s+/).filter(Boolean).length}\nChars: ${inp.length}\nLines: ${inp.split('\n').length}`;
+    else if(tool==='rev') out=inp.split('').reverse().join('');
+    else if(tool==='url') out=encodeURIComponent(inp);
+    else if(tool==='morse'){const m={'A':'.-','B':'-...','C':'-.-.','D':'-..','E':'.','F':'..-.','G':'--.','H':'....','I':'..','J':'.---','K':'-.-','L':'.-..','M':'--','N':'-.','O':'---','P':'.--.','Q':'--.-','R':'.-.','S':'...','T':'-','U':'..-','V':'...-','W':'.--','X':'-..-','Y':'-.--','Z':'--..','0':'-----','1':'.----','2':'..---','3':'...--','4':'....-','5':'.....','6':'-....','7':'--...','8':'---..','9':'----.'};out=inp.toUpperCase().split('').map(c=>c===' '?'/':m[c]||c).join(' ');}
+  }catch(e){out='Error: '+e.message;}
+  document.getElementById('tt-out').value=out;
+}
+function doColor(v){
+  const r=parseInt(v.slice(1,3),16),g=parseInt(v.slice(3,5),16),b=parseInt(v.slice(5,7),16);
+  const h=v.toUpperCase(), rgb=`rgb(${r}, ${g}, ${b})`;
+  const rn=r/255,gn=g/255,bn=b/255;
+  const max=Math.max(rn,gn,bn),min=Math.min(rn,gn,bn);
+  let H=0,S=0,L=(max+min)/2;
+  if(max!==min){S=L<0.5?(max-min)/(max+min):(max-min)/(2-max-min);if(max===rn)H=(gn-bn)/(max-min)+(gn<bn?6:0);else if(max===gn)H=(bn-rn)/(max-min)+2;else H=(rn-gn)/(max-min)+4;H/=6;}
+  const hsl=`hsl(${Math.round(H*360)}, ${Math.round(S*100)}%, ${Math.round(L*100)}%)`;
+  document.getElementById('color-out').innerHTML=`
+    <div style="background:var(--bg4);border-radius:8px;padding:8px"><div class="lbl">HEX</div><div style="font-family:var(--font-mono);font-size:13px">${h}</div></div>
+    <div style="background:var(--bg4);border-radius:8px;padding:8px"><div class="lbl">RGB</div><div style="font-family:var(--font-mono);font-size:13px">${rgb}</div></div>
+    <div style="background:var(--bg4);border-radius:8px;padding:8px"><div class="lbl">HSL</div><div style="font-family:var(--font-mono);font-size:13px">${hsl}</div></div>
+    <div style="background:${h};border-radius:8px;height:40px;border:1px solid var(--border)"></div>`;
+}
+
+/* ═══════════════════════════════════════════
+   FILE CONVERTER
+═══════════════════════════════════════════ */
+function setupDrops(){
+  const adz=document.getElementById('ai-drop');
+  if(adz){adz.addEventListener('dragover',e=>{e.preventDefault();adz.classList.add('drag');});adz.addEventListener('dragleave',()=>adz.classList.remove('drag'));adz.addEventListener('drop',e=>{e.preventDefault();adz.classList.remove('drag');const f=e.dataTransfer.files[0];if(f) processAIFile(f);});}
+  const idz=document.getElementById('img-drop');
+  if(idz){idz.addEventListener('dragover',e=>{e.preventDefault();idz.classList.add('drag');});idz.addEventListener('dragleave',()=>idz.classList.remove('drag'));idz.addEventListener('drop',e=>{e.preventDefault();idz.classList.remove('drag');const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/')) loadImgFile(f);});}
+}
+
+function setupGlobalDrop(){
+  document.addEventListener('dragover',e=>{if(e.dataTransfer.types.includes('Files')) e.preventDefault();});
+  document.addEventListener('drop',e=>{
+    if(!e.dataTransfer.files.length) return;
+    const f=e.dataTransfer.files[0];
+    if(f.type.startsWith('image/')){
+      e.preventDefault();
+      const r=new FileReader(); r.onload=ev=>createDraggableImg(ev.target.result,e.clientX,e.clientY,f.name);
+      r.readAsDataURL(f);
+    }
+  });
+}
+
+function createDraggableImg(src,x,y,name){
+  const wrap=document.createElement('div'); wrap.className='draggable-img';
+  wrap.style.cssText=`left:${x-80}px;top:${y-60}px;width:160px`;
+  let aspectRatio='auto'; let currentW=160;
+  const controls=document.createElement('div'); controls.className='img-controls';
+  controls.innerHTML=`
+    <button class="ic-btn" onclick="resizeDImg(this,'16:9')" title="16:9">16:9</button>
+    <button class="ic-btn" onclick="resizeDImg(this,'1:1')" title="1:1">1:1</button>
+    <button class="ic-btn" onclick="resizeDImg(this,'4:3')" title="4:3">4:3</button>
+    <button class="ic-btn" onclick="rotateDImg(this)" title="Rotate">↻</button>
+    <button class="ic-btn" onclick="this.closest('.draggable-img').remove()" title="Remove">✕</button>`;
+  const img=document.createElement('img'); img.src=src; img.style.cssText='width:100%;border-radius:8px;display:block;pointer-events:none';
+  wrap.appendChild(controls); wrap.appendChild(img);
+  document.getElementById('bg-layer').appendChild(wrap);
+  // Drag
+  let isDrag=false,ox=0,oy=0,startX=0,startY=0;
+  wrap.addEventListener('mousedown',e=>{if(e.target.closest('.img-controls')) return;isDrag=true;ox=wrap.offsetLeft;oy=wrap.offsetTop;startX=e.clientX;startY=e.clientY;e.preventDefault();});
+  document.addEventListener('mousemove',e=>{if(!isDrag) return;wrap.style.left=(ox+e.clientX-startX)+'px';wrap.style.top=(oy+e.clientY-startY)+'px';});
+  document.addEventListener('mouseup',()=>{isDrag=false;});
+  draggableImages.push(wrap);
+  notify('check','Image placed! Drag to move, use controls to resize/rotate.');
+}
+
+function resizeDImg(btn,ratio){
+  const wrap=btn.closest('.draggable-img'); const img=wrap.querySelector('img');
+  const [w,h]=ratio.split(':').map(Number);
+  img.style.aspectRatio=`${w}/${h}`; img.style.objectFit='cover';
+}
+function rotateDImg(btn){
+  const img=btn.closest('.draggable-img').querySelector('img');
+  const cur=parseInt(img.dataset.rot||0)+90;
+  img.dataset.rot=cur; img.style.transform=`rotate(${cur}deg)`;
+}
+
+function loadImg(inp){ if(inp.files[0]) loadImgFile(inp.files[0]); }
+function loadImgFile(file){
+  const r=new FileReader(); r.onload=e=>{
+    imgSrc=e.target.result;
+    document.getElementById('img-preview').innerHTML=`<div class="img-prev" style="margin-bottom:8px"><img src="${imgSrc}"/></div><div style="font-size:12px;color:var(--text2)">${esc(file.name)} · ${fmtSz(file.size)}</div>`;
+    document.getElementById('img-btn').disabled=false;
+    const dz=document.getElementById('img-drop');
+    if(dz) dz.querySelector('div')&&(dz.querySelector('div').textContent=file.name);
+  }; r.readAsDataURL(file);
+}
+function convertImg(){
+  if(!imgSrc){notify('alert-circle','No image!');return;}
+  const fmt=document.getElementById('img-fmt').value, q=parseInt(document.getElementById('img-q').value)/100;
+  const wIn=parseInt(document.getElementById('img-w').value)||0, hIn=parseInt(document.getElementById('img-h').value)||0;
+  const canvas=document.getElementById('cv-canvas'), ctx=canvas.getContext('2d');
+  const img=new Image(); img.onload=()=>{
+    let w=img.width,h=img.height;
+    if(wIn&&hIn){w=wIn;h=hIn;}else if(wIn){h=Math.round(img.height*(wIn/img.width));w=wIn;}else if(hIn){w=Math.round(img.width*(hIn/img.height));h=hIn;}
+    canvas.width=w;canvas.height=h;ctx.drawImage(img,0,0,w,h);
+    const ext=fmt==='image/png'?'png':fmt==='image/jpeg'?'jpg':'webp';
+    const url=canvas.toDataURL(fmt,q);
+    document.getElementById('img-preview').innerHTML+=`<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)"><div class="img-prev" style="margin-bottom:10px"><img src="${url}"/></div><a href="${url}" download="venora.${ext}" class="dl-btn"><i data-lucide="download"></i> Download .${ext.toUpperCase()}</a><span style="font-size:11px;color:var(--text2);margin-left:10px">${w}×${h}px</span></div>`;
+    try{lucide.createIcons();}catch(e){} checkAch('converter_pro',true); xp(15); notify('check','Image converted!');
+  }; img.src=imgSrc;
+}
+function txtConv(mode){
+  const inp=document.getElementById('tc-in').value.trim(); if(!inp){notify('alert-circle','Input empty!');return;}
+  let out='';
+  try{
+    if(mode==='csv2json'){const l=inp.split('\n').filter(Boolean);const h=l[0].split(',').map(x=>x.trim().replace(/^"|"$/g,''));out=JSON.stringify(l.slice(1).map(r=>{const v=r.split(',').map(x=>x.trim().replace(/^"|"$/g,''));return Object.fromEntries(h.map((k,i)=>[k,v[i]||'']));}),null,2);}
+    else if(mode==='json2csv'){const d=JSON.parse(inp);const a=Array.isArray(d)?d:[d];const h=Object.keys(a[0]);out=[h.join(','),...a.map(r=>h.map(k=>`"${(r[k]||'').toString().replace(/"/g,'""')}"`).join(','))].join('\n');}
+    else if(mode==='md2html'){out=inp.replace(/^### (.+)$/gm,'<h3>$1</h3>').replace(/^## (.+)$/gm,'<h2>$1</h2>').replace(/^# (.+)$/gm,'<h1>$1</h1>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/`(.+?)`/g,'<code>$1</code>').replace(/^- (.+)$/gm,'<li>$1</li>');}
+    else if(mode==='html2txt'){const d=document.createElement('div');d.innerHTML=inp;out=d.textContent||'';}
+    else if(mode==='tsv2csv'){out=inp.split('\n').map(l=>l.split('\t').map(c=>`"${c.replace(/"/g,'""')}"`).join(',')).join('\n');}
+    else if(mode==='xml2json'){const p=new DOMParser();const x=p.parseFromString(inp,'text/xml');function xo(n){if(n.nodeType===3)return n.nodeValue.trim();const o={};const c=Array.from(n.childNodes).filter(x=>x.nodeType!==3||x.nodeValue.trim());if(!c.length)return n.textContent;c.forEach(ch=>{const k=ch.nodeName;const v=xo(ch);o[k]=o[k]?(Array.isArray(o[k])?[...o[k],v]:[o[k],v]):v;});return o;}out=JSON.stringify(xo(x.documentElement),null,2);}
+  }catch(e){out='Error: '+e.message;}
+  document.getElementById('tc-out').value=out;
+  checkAch('converter_pro',true); xp(10); notify('check','Converted!');
+}
+function copyTC(){navigator.clipboard.writeText(document.getElementById('tc-out').value).then(()=>notify('check','Copied!')).catch(()=>notify('x','Failed'));}
+function handleAIFile(inp){if(inp.files[0]) processAIFile(inp.files[0]);}
+async function processAIFile(file){
+  notify('loader','Reading: '+file.name);
+  const area=document.getElementById('ai-file-out');
+  area.innerHTML='<div style="display:flex;align-items:center;gap:10px;padding:14px;color:var(--text2)"><div class="spin"></div> Reading…</div>';
+  let text='';
+  try{
+    text=file.name.endsWith('.pdf')?`[PDF: ${file.name} · ${fmtSz(file.size)}]\nFor full analysis, paste text into AI chat.`:await file.text();
+    const preview=text.slice(0,3000);
+    const pj=JSON.stringify(preview);
+    area.innerHTML=`<div class="card" style="margin-top:12px"><div class="ch"><i data-lucide="file-text"></i>${esc(file.name)}<span style="margin-left:auto;font-size:11px;color:var(--text2)">${fmtSz(file.size)}</span></div><div class="cb"><div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px"><button class="btn btn-p btn-sm" onclick="aiFileAct('summary',${pj})"><i data-lucide="sparkles"></i> Summarize</button><button class="btn btn-g btn-sm" onclick="aiFileAct('keypoints',${pj})">Key Points</button><button class="btn btn-g btn-sm" onclick="aiFileAct('teach',${pj})">Explain</button></div><div class="file-result"><pre>${esc(text.slice(0,1200))}${text.length>1200?'\n…('+text.length+' chars)':''}</pre></div><div id="ai-file-result"></div></div></div>`;
+    try{lucide.createIcons();}catch(e){}
+    if(file.name.endsWith('.csv')) renderCSVTable(text,'#ai-file-out .file-result');
+    if(file.name.endsWith('.json')){try{document.querySelector('#ai-file-out .file-result pre').textContent=JSON.stringify(JSON.parse(text),null,2);}catch(e){}}
+    xp(10); checkAch('file_wizard',true); saveUser();
+  }catch(e){area.innerHTML=`<div class="card" style="margin-top:12px"><div class="cb" style="color:var(--text2)">Error: ${e.message}</div></div>`;}
+}
+async function aiFileAct(action,content){
+  const p={summary:`Summarize in 4-6 sentences:\n\n${content}`,keypoints:`Extract 5-8 key points as bullets:\n\n${content}`,teach:`Explain clearly like a teacher with examples:\n\n${content}`};
+  const el=document.getElementById('ai-file-result'); if(el) el.innerHTML='<div style="display:flex;align-items:center;gap:10px;padding:14px;color:var(--text2)"><div class="spin"></div> Analyzing…</div>';
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,messages:[{role:'user',content:p[action]}]})});
+    const data=await res.json(); const txt=data.content?.[0]?.text||'No response';
+    if(el) el.innerHTML=`<div class="card" style="margin-top:10px"><div class="ch"><i data-lucide="sparkles"></i> AI Analysis</div><div class="cb" style="font-size:13px;line-height:1.65">${fmtMsg(txt)}</div></div>`;
+    try{lucide.createIcons();}catch(e){} xp(10);
+  }catch(e){if(el) el.innerHTML='<div style="color:var(--text2);padding:12px">Analysis failed. Check connection.</div>';}
+}
+function renderCSVTable(text,sel){
+  const rows=text.trim().split('\n').map(r=>r.split(','));
+  let html='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px">';
+  rows.forEach((row,i)=>{ html+='<tr>'+row.map(c=>`<${i===0?'th':'td'} style="padding:4px 8px;border:1px solid var(--border);${i===0?'background:var(--bg4);font-weight:700':''}">${esc(c.replace(/^"|"$/g,'').trim())}</${i===0?'th':'td'}>`).join('')+'</tr>'; });
+  html+='</table></div>';
+  const el=document.querySelector(sel); if(el) el.innerHTML=html;
+}
+function fmtSz(b){if(b<1024)return b+'B';if(b<1048576)return(b/1024).toFixed(1)+'KB';return(b/1048576).toFixed(1)+'MB';}
+
+/* ═══════════════════════════════════════════
+   GAMIFICATION
+═══════════════════════════════════════════ */
+function xp(n,sv=true){
+  S.XP+=n; S.dayXP+=n;
+  checkAch('xp_100',S.XP>=100); checkAch('xp_1000',S.XP>=1000);
+  updateXP(); if(sv) saveUser(); updateStats();
+}
+function coins(n,sv=true){
+  S.coins+=n; S.totalCoinsEarned+=n;
+  checkAch('coin_100',S.totalCoinsEarned>=100); checkAch('coin_500',S.totalCoinsEarned>=500);
+  updateTopbar(); if(sv) saveUser();
+  const cd=document.getElementById('coins-display'); if(cd) cd.textContent=S.coins+' ◈';
+}
+
+function getLvl(){
+  let d=LEVELS[0];
+  for(let i=0;i<LEVELS.length;i++){if(S.XP<LEVELS[i].xp||i===LEVELS.length-1){d=LEVELS[i];break;}}
+  const pi=LEVELS.indexOf(d),prev=pi>0?LEVELS[pi-1].xp:0,next=d.xp===Infinity?prev+5000:d.xp;
+  return{...d,pct:Math.min(100,((S.XP-prev)/(next-prev))*100),inLvl:S.XP-prev,toNext:next-prev};
+}
+function updateXP(){
+  const info=getLvl();
+  const e=id=>document.getElementById(id);
+  if(e('lvl-n')) e('lvl-n').textContent=info.level;
+  if(e('lvl-t')) e('lvl-t').textContent=info.title;
+  if(e('lvl-x')) e('lvl-x').textContent=`${S.XP.toLocaleString()} XP · ${info.inLvl} / ${info.toNext} to next level`;
+  if(e('lvl-bar')) e('lvl-bar').style.width=info.pct+'%';
+  if(e('s-xp')) e('s-xp').textContent=S.XP.toLocaleString();
+  if(e('xp-lbl')) e('xp-lbl').textContent=`${S.dayXP} / 200 XP`;
+  if(e('xp-bar')) e('xp-bar').style.width=Math.min(100,(S.dayXP/200)*100)+'%';
+  updateTopbar();
+}
+function updateTopbar(){
+  const tx=document.getElementById('tb-xp'); if(tx) tx.textContent=S.XP.toLocaleString()+' XP';
+  const tc=document.getElementById('tb-coins'); if(tc) tc.textContent=S.coins;
+  const su=document.getElementById('su-coins'); if(su) su.textContent=S.coins;
+}
+function renderQuests(){
+  const el=document.getElementById('quests'); if(!el) return;
+  el.innerHTML=QUEST_DEF.map(q=>{
+    const p=S.quests[q.key]||0,done=p>=q.goal;
+    return `<div class="quest-item">
+      <div style="font-size:20px">${q.icon}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600">${q.name}</div>
+        <div style="font-size:11px;color:var(--text2)">${q.desc}</div>
+        <div class="prog" style="margin-top:5px;height:3px"><div class="prog-fill" style="width:${Math.min(100,(p/q.goal)*100)}%"></div></div>
+        <div style="font-size:10px;color:var(--text3);margin-top:3px">${p}/${q.goal}${done?' ✓':''}</div>
+      </div>
+      <div style="text-align:right;font-size:11px"><div style="font-weight:700;color:var(--text2)">+${q.xp}XP</div><div class="coin-badge" style="font-weight:700">+${q.coins}◈</div></div>
+    </div>`;
+  }).join('');
+}
+function renderAchs(){
+  const el=document.getElementById('achs'); if(!el) return;
+  el.innerHTML=ACH_DEF.map(a=>{
+    const u=S.achs.includes(a.id);
+    return `<div class="ach-item${u?' unlocked':''}">
+      <div style="font-size:22px;width:36px;text-align:center">${a.icon}</div>
+      <div style="flex:1;opacity:${u?1:.4}"><div style="font-size:13px;font-weight:600">${a.name}</div><div style="font-size:11px;color:var(--text2)">${a.desc}</div></div>
+      ${u?`<div style="text-align:right;font-size:11px"><div style="font-weight:700">+${a.xp}XP</div><div class="coin-badge">+${a.coins}◈</div></div>`:'<i data-lucide="lock" style="width:13px;height:13px;color:var(--text3)"></i>'}
+    </div>`;
+  }).join('');
+  try{lucide.createIcons();}catch(e){}
+}
+function checkAch(id,cond){
+  if(cond&&!S.achs.includes(id)){
+    S.achs.push(id);
+    const a=ACH_DEF.find(x=>x.id===id); if(!a) return;
+    xp(a.xp,false); coins(a.coins,false);
+    saveUser(); renderAchs();
+    notify('award',`🏆 ${a.name} unlocked! +${a.xp}XP +${a.coins}◈`);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   SHOP
+═══════════════════════════════════════════ */
+function buildShop(){
+  const el=document.getElementById('shop-grid'); if(!el) return;
+  el.innerHTML=SHOP_ITEMS.map(item=>`
+    <div class="shop-item">
+      <div class="shop-icon">${item.icon}</div>
+      <div class="shop-name">${item.name}</div>
+      <div class="shop-desc">${item.desc}</div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px">
+        <span class="shop-price"><i data-lucide="circle-dollar-sign" style="width:13px;height:13px"></i>${item.price} ◈</span>
+        <button class="btn btn-coin btn-sm" onclick="buyItem('${item.id}')">Buy</button>
+      </div>
+    </div>`).join('');
+  try{lucide.createIcons();}catch(e){}
+}
+function buyItem(id){
+  clickSound();
+  const item=SHOP_ITEMS.find(x=>x.id===id); if(!item) return;
+  if(S.coins<item.price){notify('x','Not enough coins! Need '+item.price+' ◈');return;}
+  // Confirm
+  if(!confirm(`Buy "${item.name}" for ${item.price} ◈?`)) return;
+  S.coins-=item.price; saveUser(); updateTopbar();
+  // Apply effect
+  if(item.effect==='xp100'){xp(100);}
+  else if(item.effect==='xp500'){xp(500);}
+  else if(item.effect==='lucky'){const w=Math.floor(Math.random()*91)+10;coins(w);notify('coin-badge','🎲 Lucky! Won '+w+' ◈!');}
+  else if(item.effect==='bg_gradient'){setBg('gradient1');}
+  else if(item.effect==='title_elite'){S.titles=['Elite'];saveUser();}
+  else if(item.effect==='daily_bonus'){S.shopBonus.dailyCoinsDays=7;saveUser();}
+  checkAch('shopper',true);
+  notify('check',`Bought: ${item.name}!`);
+}
+
+/* ═══════════════════════════════════════════
+   LOGIN STREAK
+═══════════════════════════════════════════ */
+function handleLoginReward(){
+  const today=new Date().toDateString();
+  if(!S.loginDates) S.loginDates=[];
+  if(!S.loginDates.includes(today)){
+    S.loginDates.push(today);
+    // Calculate streak
+    let streak=1;
+    const dates=S.loginDates.map(d=>new Date(d)).sort((a,b)=>b-a);
+    for(let i=1;i<dates.length;i++){
+      const diff=(dates[i-1]-dates[i])/(86400000);
+      if(Math.round(diff)===1) streak++; else break;
+    }
+    S.loginStreak=streak;
+    // Daily reward
+    const xpR=10+(streak*2), coinR=2+(Math.floor(streak/7)*3);
+    // Shop bonus
+    if(S.shopBonus&&S.shopBonus.dailyCoinsDays>0){coins(5);S.shopBonus.dailyCoinsDays--;}
+    xp(xpR); coins(coinR);
+    saveUser();
+    notify('star',`🔥 Day ${streak} streak! +${xpR}XP +${coinR}◈`);
+    checkAch('first_login',true);
+    checkAch('streak7',streak>=7);
+    checkAch('streak30',streak>=30);
+    renderStreak();
+  }
+}
+function renderStreak(){
+  const el=document.getElementById('streak-display'); if(!el) return;
+  const sc=document.getElementById('streak-count'); if(sc) sc.textContent=`🔥 ${S.loginStreak||0} days`;
+  const acc=document.getElementById('acc-streak'); if(acc) acc.textContent=`${S.loginStreak||0} days`;
+  // Show last 7 days
+  const days=[];
+  for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(d.toDateString());}
+  el.innerHTML=days.map(d=>{
+    const logged=S.loginDates&&S.loginDates.includes(d);
+    const isToday=d===new Date().toDateString();
+    return `<div class="streak-day${logged?' done':''}${isToday&&!logged?' today':''}">${['Su','Mo','Tu','We','Th','Fr','Sa'][new Date(d).getDay()]}</div>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════════════
+   CALENDAR
+═══════════════════════════════════════════ */
+function buildCal(){
+  const el=document.getElementById('mini-cal'); if(!el) return;
+  const now=new Date(),y=now.getFullYear(),m=now.getMonth();
+  const first=new Date(y,m,1).getDay();
+  const taskDays=new Set(S.tasks.filter(t=>t.due).map(t=>new Date(t.due+'T00:00').getDate()));
+  const days=['Su','Mo','Tu','We','Th','Fr','Sa'];
+  let html=`<div class="cal-g" style="margin-bottom:5px">${days.map(d=>`<div class="cal-hdr">${d}</div>`).join('')}</div><div class="cal-g">`;
+  html+='<div></div>'.repeat(first);
+  for(let d=1;d<=new Date(y,m+1,0).getDate();d++){
+    html+=`<div class="cal-day${d===now.getDate()?' today':''}${taskDays.has(d)?' has-task':''}">${d}</div>`;
+  }
+  el.innerHTML=html+'</div>';
+}
+
+/* ═══════════════════════════════════════════
+   ZOMBIE SHOOTER GAME
+═══════════════════════════════════════════ */
+let game={};
+function initGameCanvas(){
+  const canvas=document.getElementById('game-canvas'); if(!canvas) return;
+  canvas.addEventListener('mousemove',e=>{if(!game.running) return;const r=canvas.getBoundingClientRect();game.mouse={x:(e.clientX-r.left)*(canvas.width/r.width),y:(e.clientY-r.top)*(canvas.height/r.height)};});
+  canvas.addEventListener('click',e=>{if(!game.running) return;shoot();});
+  canvas.addEventListener('touchstart',e=>{e.preventDefault();if(!game.running) return;const r=canvas.getBoundingClientRect();const t=e.touches[0];game.mouse={x:(t.clientX-r.left)*(canvas.width/r.width),y:(t.clientY-r.top)*(canvas.height/r.height)};shoot();});
+  canvas.addEventListener('touchmove',e=>{e.preventDefault();if(!game.running) return;const r=canvas.getBoundingClientRect();const t=e.touches[0];game.mouse={x:(t.clientX-r.left)*(canvas.width/r.width),y:(t.clientY-r.top)*(canvas.height/r.height)};});
+}
+function startGame(){
+  const canvas=document.getElementById('game-canvas'); if(!canvas) return;
+  game={running:true,hp:100,wave:1,kills:0,coins:0,player:{x:300,y:175,r:14},zombies:[],bullets:[],keys:{},mouse:{x:300,y:175},waveTimer:0,spawnTimer:0,gameOver:false};
+  document.getElementById('g-start-btn').textContent='Restart';
+  document.getElementById('g-start-btn').onclick=startGame;
+  if(gameAnimFrame) cancelAnimationFrame(gameAnimFrame);
+  spawnWave();
+  gameLoop(canvas);
+}
+function spawnWave(){
+  const count=3+(game.wave*2);
+  for(let i=0;i<count;i++){
+    const side=Math.floor(Math.random()*4);
+    let x,y;
+    if(side===0){x=Math.random()*600;y=-20;}
+    else if(side===1){x=620;y=Math.random()*350;}
+    else if(side===2){x=Math.random()*600;y=370;}
+    else{x=-20;y=Math.random()*350;}
+    game.zombies.push({x,y,hp:2+(game.wave>>1),maxHp:2+(game.wave>>1),spd:1+(game.wave*0.1)});
+  }
+}
+function shoot(){
+  if(!game.running||game.gameOver) return;
+  const dx=game.mouse.x-game.player.x,dy=game.mouse.y-game.player.y;
+  const len=Math.sqrt(dx*dx+dy*dy)||1;
+  game.bullets.push({x:game.player.x,y:game.player.y,vx:(dx/len)*12,vy:(dy/len)*12,r:5,life:60});
+}
+function gameLoop(canvas){
+  if(!game.running){return;}
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle='#0a0a0a';ctx.fillRect(0,0,canvas.width,canvas.height);
+  // Grid
+  ctx.strokeStyle='rgba(255,255,255,0.04)';ctx.lineWidth=1;
+  for(let x=0;x<canvas.width;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,canvas.height);ctx.stroke();}
+  for(let y=0;y<canvas.height;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(canvas.width,y);ctx.stroke();}
+  if(!game.gameOver){
+    // Move player (WASD)
+    const spd=3;
+    if(game.keys['w']||game.keys['arrowup']) game.player.y=Math.max(game.player.r,game.player.y-spd);
+    if(game.keys['s']||game.keys['arrowdown']) game.player.y=Math.min(canvas.height-game.player.r,game.player.y+spd);
+    if(game.keys['a']||game.keys['arrowleft']) game.player.x=Math.max(game.player.r,game.player.x-spd);
+    if(game.keys['d']||game.keys['arrowright']) game.player.x=Math.min(canvas.width-game.player.r,game.player.x+spd);
+    // Bullets
+    game.bullets.forEach((b,i)=>{b.x+=b.vx;b.y+=b.vy;b.life--;});
+    game.bullets=game.bullets.filter(b=>b.life>0&&b.x>-20&&b.x<620&&b.y>-20&&b.y<370);
+    // Zombies
+    game.zombies.forEach(z=>{const dx=game.player.x-z.x,dy=game.player.y-z.y,len=Math.sqrt(dx*dx+dy*dy)||1;z.x+=dx/len*z.spd;z.y+=dy/len*z.spd;if(len<game.player.r+15){game.hp-=0.3;}});
+    // Bullet-zombie collision
+    game.bullets.forEach((b,bi)=>{game.zombies.forEach((z,zi)=>{const dx=b.x-z.x,dy=b.y-z.y;if(Math.sqrt(dx*dx+dy*dy)<18){z.hp--;b.life=0;if(z.hp<=0){game.kills++;S.zombieKills++;const cr=Math.random()<0.3?1:0;game.coins+=cr+5;coins(cr+5,false);if(cr>0) notify('coin','◈ Coin drop!','1500');S.quests['zombie_kills']=(S.quests['zombie_kills']||0)+1;renderQuests();xp(5,false);checkAch('zombie_kill',S.zombieKills>=50);checkAch('wave10',game.wave>=10);}}});});
+    game.bullets=game.bullets.filter(b=>b.life>0);
+    game.zombies=game.zombies.filter(z=>z.hp>0);
+    if(game.hp<=0){game.hp=0;game.gameOver=true;}
+    if(!game.zombies.length){
+      if(game.wave>=50){game.gameOver=true;checkAch('wave50',true);xp(300,false);coins(200,false);notify('award','🏆 All 50 waves complete! +300XP +200◈');}
+      else{game.wave++;spawnWave();notify('star','Wave '+game.wave+'! 🌊');}
+    }
+    // Draw zombies
+    game.zombies.forEach(z=>{
+      ctx.fillStyle=`rgba(80,200,80,0.9)`;ctx.beginPath();ctx.arc(z.x,z.y,16,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#fff';ctx.font='bold 11px Inter';ctx.textAlign='center';ctx.fillText('Z',z.x,z.y+4);
+      // HP bar
+      ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(z.x-16,z.y-24,32,4);
+      ctx.fillStyle='#4ade80';ctx.fillRect(z.x-16,z.y-24,32*(z.hp/z.maxHp),4);
+    });
+    // Draw bullets
+    game.bullets.forEach(b=>{ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);ctx.fill();});
+    // Draw player
+    const ang=Math.atan2(game.mouse.y-game.player.y,game.mouse.x-game.player.x);
+    ctx.fillStyle='rgba(255,255,255,0.95)';ctx.beginPath();ctx.arc(game.player.x,game.player.y,game.player.r,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,0.5)';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(game.player.x,game.player.y);ctx.lineTo(game.player.x+Math.cos(ang)*28,game.player.y+Math.sin(ang)*28);ctx.stroke();
+    // HUD update
+    document.getElementById('g-hp').textContent=Math.ceil(game.hp);
+    document.getElementById('g-wave').textContent=game.wave;
+    document.getElementById('g-kills').textContent=game.kills;
+    document.getElementById('g-coins').textContent=game.coins;
+  } else {
+    // Game over screen
+    ctx.fillStyle='rgba(0,0,0,0.7)';ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle='#fff';ctx.font='bold 28px Inter';ctx.textAlign='center';
+    ctx.fillText(game.wave>50?'🏆 YOU WIN! 🏆':`Game Over!`,canvas.width/2,150);
+    ctx.font='16px Inter';ctx.fillStyle='rgba(255,255,255,0.7)';
+    ctx.fillText(`Wave: ${game.wave} | Kills: ${game.kills} | Coins: ${game.coins}`,canvas.width/2,185);
+    ctx.font='14px Inter';ctx.fillStyle='rgba(255,255,255,0.5)';
+    ctx.fillText('Click Restart to play again',canvas.width/2,215);
+    saveUser(); updateXP(); updateTopbar();
+  }
+  gameAnimFrame=requestAnimationFrame(()=>gameLoop(canvas));
+}
+// Key events
+document.addEventListener('keydown',e=>{if(game&&game.running) game.keys[e.key.toLowerCase()]=true;});
+document.addEventListener('keyup',e=>{if(game) game.keys[e.key.toLowerCase()]=false;});
+
+/* ═══════════════════════════════════════════
+   STORY GAME
+═══════════════════════════════════════════ */
+function startStory(){
+  clickSound(); renderStoryNode('start');
+}
+function renderStoryNode(id){
+  const node=STORY_NODES[id]; if(!node) return;
+  const box=document.getElementById('story-box'); if(!box) return;
+  box.style.animation='panIn 0.3s ease';
+  box.innerHTML=node.text;
+  const choices=document.getElementById('story-choices'); if(!choices) return;
+  if(node.end){
+    choices.innerHTML='<button class="story-choice" onclick="startStory()" style="margin-top:8px">🔄 Play Again</button>';
+    if(node.reward){xp(node.reward.xp);coins(node.reward.coins);notify('star',`Story complete! +${node.reward.xp}XP +${node.reward.coins}◈`);}
+    S.storyCompleted=(S.storyCompleted||0)+1; checkAch('story_end',true); saveUser();
+  } else {
+    choices.innerHTML=node.choices.map(c=>`<button class="story-choice" onclick="renderStoryNode('${c.next}')">→ ${c.text}</button>`).join('');
+  }
+}
+
+/* ═══════════════════════════════════════════
+   GUIDE
+═══════════════════════════════════════════ */
+function buildGuide(){
+  const el=document.getElementById('guide-content'); if(!el) return;
+  const steps=[
+    {title:'Create Your Account',text:'When you first open Venora, you\'ll be asked to create an account. Your username is permanent (7-day cooldown to change), but your nickname can be changed anytime. All your progress is saved to your account.'},
+    {title:'Use the AI Assistant',text:'Go to the AI tab to chat with Claude. Choose a mode: Tutor for full explanations, Exam Helper for quick answers, Simplify for easy language, or Step-by-Step for detailed walkthroughs. You can create multiple chat sessions!'},
+    {title:'Take Notes',text:'The Notes tab has a full rich text editor. Use the toolbar to add bold, italic, bullet lists, headings, and even images. Notes auto-save and are linked to your account.'},
+    {title:'Track Homework',text:'Add tasks in the Homework tab with a subject, due date, and priority. Complete tasks to earn XP and coins. Tasks show on the mini calendar.'},
+    {title:'Earn XP and Coins',text:'Everything you do earns XP and coins — asking AI questions, saving notes, completing tasks, killing zombies in the game. Level up to unlock titles. Use coins in the Shop!'},
+    {title:'Play Games',text:'The Game tab has a zombie shooter (WASD to move, click/tap to shoot) and a text adventure story. Killing zombies earns XP and coins. Complete all 50 waves for a special achievement!'},
+    {title:'Convert Anything',text:'The Converter Hub has a full calculator, unit converter (length, weight, temperature, speed, and more), text tools (Base64, JSON formatter, Morse code), and a color converter.'},
+    {title:'Convert Files',text:'Upload images to convert between PNG/JPG/WEBP, resize them, and more. Convert CSV to JSON, Markdown to HTML, XML to JSON. Upload text files for AI analysis!'},
+    {title:'Customize Everything',text:'Settings lets you switch between dark and light mode, change fonts, adjust blur and border radius, change language (English/Thai/Japanese/Chinese/Korean), and upload a custom background.'},
+    {title:'Daily Rewards',text:'Log in every day to build your streak! Each day gives XP and coins. A 7-day streak earns a special achievement. Complete daily quests for bonus rewards.'},
+    {title:'Drag Images Anywhere',text:'Drag any image file onto Venora to place it anywhere on screen. You can move it around, resize it with 16:9/1:1/4:3 ratios, and rotate it. Great for vision boards!'},
+  ];
+  el.innerHTML=steps.map((s,i)=>`
+    <div class="guide-step">
+      <div class="guide-num">${i+1}</div>
+      <div class="guide-info"><h3>${s.title}</h3><p>${s.text}</p></div>
+    </div>`).join('');
+}
+
+/* ═══════════════════════════════════════════
+   SETTINGS
+═══════════════════════════════════════════ */
+function applySettings(){
+  const cfg=S.settings||{};
+  currentLang=cfg.lang||'en';
+  soundEnabled=cfg.sound!==false;
+  document.documentElement.style.setProperty('--blur',(cfg.blur||20)+'px');
+  document.documentElement.style.setProperty('--radius',(cfg.radius||13)+'px');
+  document.documentElement.style.setProperty('--anim',cfg.anim===false?'0s':'0.3s');
+  document.documentElement.style.fontSize=(cfg.fs||14)+'px';
+  const fonts={inter:"'Inter',sans-serif",space:"'Space Grotesk',sans-serif",mono:"'Fira Code',monospace",playfair:"'Playfair Display',serif"};
+  document.documentElement.style.setProperty('--font',fonts[cfg.font||'inter']);
+  // Dark mode
+  if(cfg.darkMode===false) document.body.classList.add('light'); else document.body.classList.remove('light');
+  setBg(cfg.bg||'none',false);
+  applyLang();
+}
+function buildSettingsValues(){
+  const cfg=S.settings||{};
+  const sv=(id,v)=>{const e=document.getElementById(id);if(e){e.value=v;}};
+  const st=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  sv('s-blur',cfg.blur||20);st('s-blurv',(cfg.blur||20)+'px');
+  sv('s-rad',cfg.radius||13);st('s-radv',(cfg.radius||13)+'px');
+  sv('s-fs',cfg.fs||14);st('s-fsv',(cfg.fs||14)+'px');
+  const dt=document.getElementById('dark-toggle');if(dt) dt.classList.toggle('on',cfg.darkMode!==false);
+  const st2=document.getElementById('sound-toggle');if(st2) st2.classList.toggle('on',cfg.sound!==false);
+  const at=document.getElementById('anim-toggle');if(at) at.classList.toggle('on',cfg.anim!==false);
+}
+function buildSettingsPreview(){
+  // Preview just updates live via CSS vars
+}
+function sBlur(v){S.settings.blur=+v;document.documentElement.style.setProperty('--blur',v+'px');document.getElementById('s-blurv').textContent=v+'px';saveUser();}
+function sRad(v){S.settings.radius=+v;document.documentElement.style.setProperty('--radius',v+'px');document.getElementById('s-radv').textContent=v+'px';saveUser();}
+function sFS(v){S.settings.fs=+v;document.documentElement.style.fontSize=v+'px';document.getElementById('s-fsv').textContent=v+'px';saveUser();}
+function toggleDark(el){S.settings.darkMode=!S.settings.darkMode;el.classList.toggle('on',S.settings.darkMode);if(!S.settings.darkMode)document.body.classList.add('light');else document.body.classList.remove('light');saveUser();}
+function toggleSound(el){soundEnabled=!soundEnabled;S.settings.sound=soundEnabled;el.classList.toggle('on',soundEnabled);saveUser();}
+function toggleAnim(el){const on=!S.settings.anim||S.settings.anim===false;S.settings.anim=on;el.classList.toggle('on',on);document.documentElement.style.setProperty('--anim',on?'0.3s':'0s');saveUser();}
+function setFont(f,label){S.settings.font=f;const fonts={inter:"'Inter',sans-serif",space:"'Space Grotesk',sans-serif",mono:"'Fira Code',monospace",playfair:"'Playfair Display',serif"};document.documentElement.style.setProperty('--font',fonts[f]);saveUser();notify('check','Font: '+(label||f));}
+function setBg(type,sv=true){
+  if(!S.settings) S.settings={};
+  S.settings.bg=type;
+  const bg=document.getElementById('bg-layer');if(!bg)return;
+  const bgs={
+    none:'background:none',
+    gradient1:'background:radial-gradient(ellipse at 20% 20%,rgba(255,255,255,0.03) 0%,transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(255,255,255,0.02) 0%,transparent 60%)',
+    gradient2:'background:radial-gradient(ellipse at 50% 0%,rgba(255,255,255,0.04) 0%,transparent 70%)',
+    dots:'background-image:radial-gradient(circle,rgba(255,255,255,0.07) 1px,transparent 1px);background-size:28px 28px',
+    grid:'background-image:linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px);background-size:40px 40px',
+  };
+  bg.style.cssText=bgs[type]||'background:none';
+  if(sv) saveUser();
+}
+function uploadBG(inp){
+  if(!inp.files[0]) return;
+  const r=new FileReader(); r.onload=e=>{
+    const bg=document.getElementById('bg-layer');if(!bg)return;
+    bg.style.cssText=`background-image:url('${e.target.result}');background-size:cover;background-position:center`;
+    S.settings.bg='custom'; saveUser();
+  }; r.readAsDataURL(inp.files[0]);
+}
+function buildFeatToggles(){
+  const el=document.getElementById('feat-toggles');if(!el)return;
+  const feats=[{k:'ai',l:'AI Assistant',d:'Claude-powered chat'},{k:'files',l:'File Intelligence',d:'Upload & analyze'},{k:'anim',l:'Animations',d:'UI effects'},{k:'game',l:'Gamification',d:'XP & achievements'}];
+  el.innerHTML=feats.map(f=>`<div class="srow"><div><div class="srow-l">${f.l}</div><div class="srow-d">${f.d}</div></div><div class="toggle${S.settings.feats[f.k]?' on':''}" onclick="togFeat('${f.k}',this)"></div></div>`).join('');
+}
+function togFeat(k,el){S.settings.feats[k]=!S.settings.feats[k];el.classList.toggle('on',S.settings.feats[k]);saveUser();}
+
+/* ═══════════════════════════════════════════
+   ACCOUNT PAGE
+═══════════════════════════════════════════ */
+function updateAccountPage(){
+  const e=id=>document.getElementById(id);
+  if(e('acc-username')) e('acc-username').textContent=currentUser||'';
+  if(e('profile-nick')) e('profile-nick').value=S.nickname||'';
+  if(e('acc-created')) e('acc-created').textContent=S.createdAt?new Date(S.createdAt).toLocaleDateString():'';
+  if(e('acc-xp')) e('acc-xp').textContent=(S.XP||0).toLocaleString();
+  if(e('acc-coins')) e('acc-coins').textContent=(S.coins||0)+' ◈';
+  // Avatar
+  const av=e('profile-av'),avt=e('profile-av-text');
+  if(S.avatarData&&av){av.innerHTML=`<img src="${S.avatarData}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/><div class="avatar-overlay"><i data-lucide="camera"></i></div>`;try{lucide.createIcons();}catch(ex){}}
+  else if(avt){avt.textContent=(S.nickname||currentUser||'U')[0].toUpperCase();}
+  // Username change cooldown
+  const cd=e('username-cd-info');
+  if(cd&&S.usernameChangedAt){const d=new Date(S.usernameChangedAt),now=new Date(),diff=7-(now-d)/(86400000);if(diff>0)cd.textContent=`Username can be changed in ${Math.ceil(diff)} days`;else cd.textContent='';}
+}
+function updateSidebarUser(){
+  const av=document.getElementById('su-av'),nm=document.getElementById('su-name');
+  if(nm) nm.textContent=S.nickname||currentUser||'User';
+  if(av){
+    if(S.avatarData) av.innerHTML=`<img src="${S.avatarData}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>`;
+    else av.textContent=(S.nickname||currentUser||'U')[0].toUpperCase();
+  }
+}
+function uploadAvatar(inp){
+  if(!inp.files[0]) return;
+  const r=new FileReader(); r.onload=e=>{S.avatarData=e.target.result;saveUser();updateAccountPage();updateSidebarUser();notify('check','Avatar updated!');};
+  r.readAsDataURL(inp.files[0]);
+}
+function saveProfile(){
+  const nick=document.getElementById('profile-nick').value.trim();
+  if(nick) S.nickname=nick;
+  saveUser(); updateAccountPage(); updateSidebarUser();
+  notify('check','Profile saved!');
+}
+
+/* ═══════════════════════════════════════════
+   STATS
+═══════════════════════════════════════════ */
+function updateStats(){
+  const e=id=>document.getElementById(id);
+  if(e('s-xp')) e('s-xp').textContent=(S.XP||0).toLocaleString();
+  if(e('s-tasks')) e('s-tasks').textContent=S.tasks.filter(t=>t.done).length;
+  if(e('s-notes')) e('s-notes').textContent=S.notes.length;
+  if(e('s-coins')) e('s-coins').textContent=S.coins||0;
+  updateXP(); updateTopbar(); updateAccountPage();
+}
+
+/* ═══════════════════════════════════════════
+   NOTIFICATIONS
+═══════════════════════════════════════════ */
+function notify(icon,msg,ms=3200){
+  const el=document.getElementById('notif');
+  const d=document.createElement('div');
+  d.className='nitem'+(icon==='coin'?' coin':'');
+  d.innerHTML=`<i data-lucide="${icon==='coin'?'circle-dollar-sign':icon==='loader'?'loader':icon==='save'?'save':icon==='star'?'star':icon==='award'?'award':icon==='x'?'x-circle':icon==='alert-circle'?'alert-circle':'check-circle'}"></i><span>${msg}</span>`;
+  el.appendChild(d);
+  try{lucide.createIcons();}catch(e){}
+  setTimeout(()=>{d.style.opacity='0';d.style.transform='translateX(16px)';d.style.transition='all .25s';setTimeout(()=>d.remove(),280);},typeof ms==='string'?parseInt(ms):ms);
+}
+
+/* ═══════════════════════════════════════════
+   UTILS
+═══════════════════════════════════════════ */
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+</script>
+</body>
+</html>
